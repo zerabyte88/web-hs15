@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>HS15</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="background.css">
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="choose.css">
+  <link rel="icon" href="img/logo.jpg" type="image/svg+xml">
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body>
+  <div id="bkgd1"></div>
+  <div id="bkgd2"></div>
+
+  <section>
+    <div class="form-box">
+      <div class="form-value">
+        <form action="login.php" method="post">
+          <h2>Selamat Datang</h2>
+            <p class="form-subtitle">Masukkan email dan password Anda</p>
+          
+          <div class="inputbox">
+            <input type="email" name="email" required autocomplete="off">
+            <label>Email</label>
+            <ion-icon name="mail"></ion-icon>
+          </div>
+
+          <div class="inputbox">
+            <input type="password" name="password" required>
+            <label>Password</label>
+            <ion-icon name="lock-closed"></ion-icon>
+          </div>
+
+          <button type="submit">Continue</button>
+          <p>Belum punya akun? <a href="register.php">Register di sini</a></p>
+          <p>Lupa password? <a href="fgpass.php">Reset password</a></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <script src="choose.js"></script>
+  
+</body>
+</html>
