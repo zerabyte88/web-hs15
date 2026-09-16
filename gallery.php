@@ -104,12 +104,20 @@ $globalVer = file_exists('global.css') ? filemtime('global.css') : time();
         <img src="img/logo.jpg" alt="HS15 Logo" class="logo-img">
         <span>HS15 - Komunitas Keliling Banjar</span>
       </a>
-      <ul id="menu">
+      <ul id="menu" class="nav-main">
         <li><a href="choose.html">Beranda</a></li>
         <li><a href="gallery.php" class="nav-active">Foto</a></li>
         <li><a href="vidgallery.php">Video</a></li>
-        <li><a href="logout.php" class="nav-logout">Log Out</a></li>
       </ul>
+      <div class="profile-menu">
+        <button type="button" class="profile-button" aria-expanded="false" aria-controls="profile-dropdown" title="Menu akun">
+          <img src="img/logo.jpg" alt="Foto profil" class="profile-avatar">
+        </button>
+        <div id="profile-dropdown" class="profile-dropdown">
+          <a href="fgpass.php">Setelan Akun</a>
+          <a href="logout.php" class="dropdown-logout">Log Out</a>
+        </div>
+      </div>
     </nav>
   </header>
 
@@ -169,6 +177,8 @@ $globalVer = file_exists('global.css') ? filemtime('global.css') : time();
   <footer class="main-footer">
     <p>&copy; 2026 HS15 - Komunitas Keliling Banjar. All rights reserved.</p>
   </footer>
+
+  <script src="nav.js"></script>
 
   <!-- Lightbox Modal Fullscreen -->
   <div id="lightbox" class="lightbox" role="dialog" aria-modal="true">

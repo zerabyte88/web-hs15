@@ -77,12 +77,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
       <?php endif; ?>
 
-      <form method="post" autocomplete="on">
+      <form method="post" autocomplete="off">
         <div class="input-group">
           <label for="email">Email</label>
           <div class="input-wrapper">
             <ion-icon name="mail-outline" class="input-icon-left"></ion-icon>
-            <input type="email" id="email" name="email" value="<?= htmlspecialchars($email_val) ?>" placeholder="nama@email.com" required autofocus>
+            <input type="email" id="email" name="email" autocomplete="off" placeholder="nama@email.com" required autofocus>
           </div>
         </div>
 
@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <label for="password">Password</label>
           <div class="input-wrapper">
             <ion-icon name="lock-closed-outline" class="input-icon-left"></ion-icon>
-            <input type="password" id="password" name="password" placeholder="Minimal 6 karakter" required>
+            <input type="password" id="password" name="password" autocomplete="new-password" placeholder="Minimal 6 karakter" required>
             <button type="button" class="toggle-password" title="Lihat password" aria-label="Toggle password visibility">
               <ion-icon name="eye-outline"></ion-icon>
             </button>
@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <label for="confirm_password">Konfirmasi Password</label>
           <div class="input-wrapper">
             <ion-icon name="shield-checkmark-outline" class="input-icon-left"></ion-icon>
-            <input type="password" id="confirm_password" name="confirm_password" placeholder="Ulangi password Anda" required>
+            <input type="password" id="confirm_password" name="confirm_password" autocomplete="new-password" placeholder="Ulangi password Anda" required>
             <button type="button" class="toggle-password" title="Lihat password" aria-label="Toggle confirm password visibility">
               <ion-icon name="eye-outline"></ion-icon>
             </button>

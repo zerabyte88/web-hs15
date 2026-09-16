@@ -171,16 +171,16 @@ body.choose-page {
 /* Optimasi Khusus HP / Layar Mobile */
 @media (max-width: 768px) {
   body.choose-page {
-    padding-top: 110px;
+    padding-top: 104px;
   }
 
   .choose-main {
-    padding: 24px 16px 40px;
+    padding: 30px 16px 40px;
     justify-content: flex-start;
   }
 
   .hero-section {
-    margin-bottom: 24px;
+    margin-bottom: 28px;
   }
 
   .hero-section h1 {
@@ -200,9 +200,9 @@ body.choose-page {
 
   .card {
     width: 100%;
-    max-width: 360px;
+    max-width: 420px;
     min-height: auto;
-    padding: 26px 20px;
+    padding: 30px 20px;
   }
 
   .card:active {

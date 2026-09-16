@@ -74,12 +74,12 @@ if (isset($_GET['reset']) && $_GET['reset'] == 1) {
         </div>
       <?php endif; ?>
 
-      <form action="login.php" method="post" autocomplete="on">
+      <form action="login.php" method="post" autocomplete="off">
         <div class="input-group">
           <label for="email">Email</label>
           <div class="input-wrapper">
             <ion-icon name="mail-outline" class="input-icon-left"></ion-icon>
-            <input type="email" id="email" name="email" placeholder="nama@email.com" required autofocus>
+            <input type="email" id="email" name="email" autocomplete="off" placeholder="nama@email.com" required autofocus>
           </div>
         </div>
 
@@ -87,7 +87,7 @@ if (isset($_GET['reset']) && $_GET['reset'] == 1) {
           <label for="password">Password</label>
           <div class="input-wrapper">
             <ion-icon name="lock-closed-outline" class="input-icon-left"></ion-icon>
-            <input type="password" id="password" name="password" placeholder="••••••••" required>
+            <input type="password" id="password" name="password" autocomplete="new-password" placeholder="••••••••" required>
             <button type="button" class="toggle-password" title="Lihat password" aria-label="Toggle password visibility">
               <ion-icon name="eye-outline"></ion-icon>
             </button>
