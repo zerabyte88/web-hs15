@@ -1,17 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HS15</title>
+  <title>HS15 - Jelajahi Galeri</title>
+  <link rel="stylesheet" href="background.css">
   <link rel="stylesheet" href="global.css">
   <link rel="stylesheet" href="choose.css">
-  <link rel="stylesheet" href="background.css">
-  <link rel="icon" href="img/logo.jpg" type="image/svg+xml">
+  <link rel="icon" href="img/logo.jpg" type="image/jpeg">
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </head>
 <body class="choose-page">
 
-  <!-- Header & Navigasi -->
+  <!-- Header Navigasi -->
   <header>
     <nav>
       <a href="choose.html" class="logo" id="logo-link">
@@ -22,42 +24,72 @@
         <li><a href="choose.html" class="nav-active">Beranda</a></li>
         <li><a href="gallery.php">Foto</a></li>
         <li><a href="vidgallery.php">Video</a></li>
-        <li><a href="index.html">Log Out</a></li>
+        <li><a href="logout.php" class="nav-logout">Log Out</a></li>
       </ul>
     </nav>
   </header>
 
-  <!-- Latar Belakang Slideshow -->
+  <!-- Latar Belakang Slideshow & Overlay (Tetap dipertahankan) -->
   <div id="bkgd1"></div>
   <div id="bkgd2"></div>
+  <div class="bkgd-overlay"></div>
 
   <!-- Konten Utama Landing Page -->
-  <main class="container">
+  <main class="choose-main">
     <div class="hero-section">
-      <h1>Jelajahi Bersama HS15</h1>
+      <h1>Jelajahi Dokumentasi HS15</h1>
+      <p>Arsip koleksi momen kebersamaan, perjalanan keliling Banjar dalam foto & video</p>
     </div>
 
     <div class="menu">
       <a href="gallery.php" class="card">
         <div class="content">
-          <div class="icon">&#128444;&#65039;</div>
+          <div class="icon">
+            <ion-icon name="images-outline"></ion-icon>
+          </div>
           <h2>Galeri Foto</h2>
-          <p>Lihat koleksi foto perjalanan kami</p>
+          <p>Lihat koleksi foto momen dokumentasi perjalanan kami</p>
+          <span class="card-action">Buka Galeri <ion-icon name="arrow-forward-outline"></ion-icon></span>
         </div>
       </a>
 
       <a href="vidgallery.php" class="card">
         <div class="content">
-          <div class="icon">&#127916;</div>
+          <div class="icon">
+            <ion-icon name="videocam-outline"></ion-icon>
+          </div>
           <h2>Galeri Video</h2>
-          <p>Tonton dokumentasi video kami</p>
+          <p>Tonton rekaman dokumentasi video seru kami</p>
+          <span class="card-action">Buka Galeri <ion-icon name="arrow-forward-outline"></ion-icon></span>
         </div>
       </a>
     </div>
   </main>
 
-  <!-- Skrip Slideshow -->
+  <!-- Footer Copyright -->
+  <footer class="main-footer">
+    <p>&copy; 2026 HS15 - Komunitas Keliling Banjar. All rights reserved.</p>
+  </footer>
+
+  <!-- Skrip Slideshow & Scroll Header -->
   <script src="choose.js"></script>
+  <script>
+    let lastScrollTop = 0;
+    window.addEventListener("scroll", function () {
+      const header = document.querySelector("header");
+      if (!header) return;
+
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+
+      if (scrollTop > lastScrollTop && scrollTop > 80) {
+        header.classList.add("hide-header");
+      } else if (scrollTop < lastScrollTop) {
+        header.classList.remove("hide-header");
+      }
+
+      lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+    }, { passive: true });
+  </script>
 
 </body>
 </html>

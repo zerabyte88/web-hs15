@@ -1,58 +1,117 @@
-// Header hide/show on scroll
-var lastScrollTop = 0;
+// gallery.js - Interaksi Galeri Foto & Lightbox
 
-document.addEventListener("scroll", function () {
-  var header = document.querySelector("header");
+// Sembunyikan/tampilkan header saat scroll
+let lastScrollTop = 0;
+window.addEventListener("scroll", function () {
+  const header = document.querySelector("header");
   if (!header) return;
 
-  var scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
 
-  // Scroll ke bawah - sembunyikan header
   if (scrollTop > lastScrollTop && scrollTop > 100) {
     header.classList.add("hide-header");
-  } 
-  // Scroll ke atas - tampilkan header
-  else if (scrollTop < lastScrollTop) {
+  } else if (scrollTop < lastScrollTop) {
     header.classList.remove("hide-header");
   }
-  
-  lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // For Mobile or negative scrolling
-});
 
-document.addEventListener("DOMContentLoaded", () => {
-  const lightbox    = document.getElementById("lightbox");
+  lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+}, { passive: true });
+
+// Lightbox dengan navigasi
+document.addEventListener("DOMContentLoaded", function () {
+  const lightbox = document.getElementById("lightbox");
   const lightboxImg = document.getElementById("lightboxImg");
-  const caption     = document.getElementById("caption");
-  const closeBtn    = document.getElementById("closeBtn");
+  const caption = document.getElementById("caption");
+  const counter = document.getElementById("lightboxCounter");
+  const closeBtn = document.getElementById("closeBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const backdrop = document.querySelector(".lightbox__backdrop");
 
-  // Klik thumbnail → buka lightbox
-  document.querySelectorAll(".gallery img").forEach(img => {
-    img.addEventListener("click", () => {
-      lightbox.classList.add("open");          // gunakan class "open" konsisten
-      lightboxImg.src = img.dataset.full;      // tampilkan gambar asli
-      caption.textContent = img.alt || "";     // isi caption
+  if (!lightbox || !lightboxImg) return;
+
+  const figures = Array.from(document.querySelectorAll(".gallery figure"));
+  if (figures.length === 0) return;
+
+  let currentIndex = 0;
+
+  function showImage(index) {
+    if (index < 0) {
+      index = figures.length - 1;
+    } else if (index >= figures.length) {
+      index = 0;
+    }
+
+    currentIndex = index;
+    const figure = figures[currentIndex];
+    const img = figure.querySelector("img");
+    const fullSrc = figure.getAttribute("data-full") || (img ? img.dataset.full : "");
+    const imgCaption = figure.getAttribute("data-caption") || (img ? img.alt : "");
+
+    // Set langsung tanpa menunggu agar foto langsung tampil
+    lightboxImg.src = fullSrc;
+    lightboxImg.alt = imgCaption;
+    if (caption) caption.textContent = imgCaption;
+    if (counter) counter.textContent = (currentIndex + 1) + " / " + figures.length;
+  }
+
+  function openLightbox(index) {
+    lightbox.classList.add("open");
+    document.body.style.overflow = "hidden";
+    showImage(index);
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove("open");
+    document.body.style.overflow = "";
+    lightboxImg.src = "";
+  }
+
+  // Klik figure atau gambar untuk membuka lightbox
+  figures.forEach(function (figure, idx) {
+    figure.addEventListener("click", function () {
+      openLightbox(idx);
     });
   });
 
-  // Klik tombol close → tutup
-  closeBtn.addEventListener("click", () => {
-    lightbox.classList.remove("open");
-    lightboxImg.src = ""; // kosongkan agar tidak ada gambar tersisa
-  });
+  // Tombol navigasi
+  if (prevBtn) {
+    prevBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      showImage(currentIndex - 1);
+    });
+  }
 
-  // Klik backdrop (area luar gambar) → tutup
-  lightbox.addEventListener("click", (e) => {
-    if (e.target === lightbox) {
-      lightbox.classList.remove("open");
-      lightboxImg.src = "";
-    }
-  });
+  if (nextBtn) {
+    nextBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      showImage(currentIndex + 1);
+    });
+  }
 
-  // Tekan ESC → tutup
-  document.addEventListener("keydown", (e) => {
+  if (closeBtn) {
+    closeBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      closeLightbox();
+    });
+  }
+
+  if (backdrop) {
+    backdrop.addEventListener("click", function () {
+      closeLightbox();
+    });
+  }
+
+  // Navigasi keyboard (Esc, Panah Kiri, Panah Kanan)
+  document.addEventListener("keydown", function (e) {
+    if (!lightbox.classList.contains("open")) return;
+
     if (e.key === "Escape") {
-      lightbox.classList.remove("open");
-      lightboxImg.src = "";
+      closeLightbox();
+    } else if (e.key === "ArrowLeft") {
+      showImage(currentIndex - 1);
+    } else if (e.key === "ArrowRight") {
+      showImage(currentIndex + 1);
     }
   });
 });

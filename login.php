@@ -2,15 +2,21 @@
 session_start();
 require 'connect.php';
 
-// pastikan form mengirimkan data
+// Pastikan form mengirimkan data
 if (!isset($_POST['email'], $_POST['password'])) {
-    exit("Form tidak lengkap.");
+    header("Location: index.php?error=empty_fields");
+    exit;
 }
 
 $email = trim($_POST['email']);
 $password = $_POST['password'];
 
-// ambil user berdasarkan email
+if (empty($email) || empty($password)) {
+    header("Location: index.php?error=empty_fields");
+    exit;
+}
+
+// Ambil user berdasarkan email
 $stmt = $conn->prepare("SELECT id, email, password FROM users WHERE email = ?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
@@ -19,19 +25,21 @@ $result = $stmt->get_result();
 if ($result->num_rows === 1) {
     $user = $result->fetch_assoc();
 
-    // verifikasi password dengan hash
+    // Verifikasi password dengan hash
     if (password_verify($password, $user['password'])) {
-        // login sukses → simpan session
+        // Login sukses → simpan session
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['email']   = $user['email'];
 
-        // arahkan ke halaman berikut
+        // Arahkan ke halaman beranda
         header("Location: choose.html");
         exit;
     } else {
-        echo "Password salah!";
+        header("Location: index.php?error=invalid_password");
+        exit;
     }
 } else {
-    echo "Email tidak ditemukan!";
+    header("Location: index.php?error=user_not_found");
+    exit;
 }
 ?>

@@ -1,159 +1,137 @@
-@import url('https://fonts.googleapis.com/css?family=Poppins:400,600,700,900');
+/* vidgallery.css - Grid Video Minimalis & Rapi */
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+.page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 30px 20px 60px;
 }
 
-/* Body styling */
-html, body {
-  margin: 0;
-  padding-top: 70px;
+.gallery-hero {
+  text-align: center;
+  margin-bottom: 30px;
 }
 
-/* Grid 4 kolom */
+.gallery-hero h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.gallery-hero p {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* Grid Video 4 Kolom */
 .gallery {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 15px;
-  padding: 20px;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-/* Responsive untuk mobile */
 @media (max-width: 1200px) {
-  .gallery {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  .gallery { grid-template-columns: repeat(3, 1fr); gap: 16px; }
 }
 
 @media (max-width: 768px) {
-  .gallery {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .gallery { grid-template-columns: repeat(2, 1fr); gap: 14px; }
 }
 
 @media (max-width: 480px) {
-  .gallery {
-    grid-template-columns: 1fr;
-  }
+  .gallery { grid-template-columns: 1fr; gap: 14px; }
 }
 
+/* Kartu Video */
 .vWrap {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16/9;
+  background: rgba(18, 20, 26, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
   overflow: hidden;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  background: #f0f0f0;
-  transition: box-shadow 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .vWrap:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  transform: translateY(-4px);
+  border-color: rgba(229, 9, 20, 0.5);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
 }
 
-.vWrap video {
+.video-box {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000000;
+  overflow: hidden;
+}
+
+.video-box video {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-  background: #000;
-}
-
-.vWrap video:hover {
-  transform: scale(1.05);
-}
-
-.vWrap video.full:hover {
-  transform: none;
-}
-
-/* Caption selalu tampil */
-.vCaption {
-  text-align: center;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  font-size: 14px;
-  color: #333;
-  font-weight: 500;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-  word-break: break-word;
-}
-
-/* Fullscreen mode - FIXED */
-.vWrap video.full {
-  position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
-  width: 90vw !important;
-  max-width: 1000px !important;
-  height: auto !important;
-  z-index: 10001 !important;
-  transform: translate(-50%, -50%) !important;
-  box-shadow: 0 0 30px rgba(0,0,0,0.9) !important;
-  border-radius: 8px !important;
-  object-fit: contain !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* Overlay background - dinamis dari JS */
-#vplay-overlay {
   display: block;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.85);
-  z-index: 10000;
-  cursor: pointer;
+  background: #000000;
+  outline: none;
 }
 
-/* Hapus old overlay styling */
-.gallery::after {
-  display: none !important;
-}
-
-.gallery.showOverlay::after {
-  display: none !important;
+/* Caption */
+.vCaption {
+  padding: 10px 14px;
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: #ffffff;
+  background: rgba(14, 16, 22, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 /* Pagination */
 .pagination {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 10px;
-  margin-top: 30px;
-  padding: 20px;
+  margin-top: 40px;
   flex-wrap: wrap;
 }
 
-.pagination a,
-.pagination .page-info {
-  padding: 10px 15px;
-  border-radius: 4px;
+.page-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 18px;
+  border-radius: 20px;
   text-decoration: none;
   color: #ffffff;
-  border: 1px solid #ddd;
-  transition: all 0.3s ease;
-  background: #000000;
+  font-size: 0.88rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.25s ease;
 }
 
-.pagination a:hover {
-  background-color: #ff0000;
-  color: white;
-  border-color: #ff0000;
+.page-btn:hover {
+  background: linear-gradient(135deg, #e50914 0%, #b80710 100%);
+  border-color: #e50914;
+  box-shadow: 0 4px 14px rgba(229, 9, 20, 0.35);
+  transform: translateY(-1px);
 }
 
-.pagination .page-info {
-  background-color: #000000;
-  border: none;
-  font-weight: bold;
+.page-edge {
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.page-info {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.65);
+  padding: 0 10px;
+  font-weight: 500;
 }
