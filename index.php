@@ -33,6 +33,10 @@ if (isset($_GET['registered']) && $_GET['registered'] == 1) {
 if (isset($_GET['reset']) && $_GET['reset'] == 1) {
     $success_message = 'Password berhasil diperbarui! Silakan login dengan password baru.';
 }
+
+if (isset($_GET['deleted']) && $_GET['deleted'] == 1) {
+  $success_message = 'Akun berhasil dihapus secara permanen.';
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">

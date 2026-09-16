@@ -1,0 +1,301 @@
+.account-page {
+  width: min(1100px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 42px 0 64px;
+}
+
+.account-hero {
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  margin-bottom: 6px;
+  color: #ff5667;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.account-hero h1 {
+  margin-bottom: 6px;
+  font-size: 2.2rem;
+}
+
+.account-hero > p:last-child {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.account-alert {
+  margin-bottom: 18px;
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  font-size: 0.88rem;
+}
+
+.account-alert-error {
+  color: #ffabb6;
+  background: rgba(229, 9, 20, 0.12);
+  border-color: rgba(229, 9, 20, 0.3);
+}
+
+.account-alert-success {
+  color: #b9f4d0;
+  background: rgba(46, 184, 111, 0.12);
+  border-color: rgba(46, 184, 111, 0.3);
+}
+
+.account-grid {
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.account-card {
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(18, 20, 26, 0.86);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.account-summary {
+  text-align: center;
+}
+
+.profile-preview {
+  position: relative;
+  width: 112px;
+  height: 112px;
+  margin: 0 auto 16px;
+}
+
+.profile-preview img {
+  width: 100%;
+  height: 100%;
+  border: 3px solid rgba(229, 9, 20, 0.75);
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 5px 22px rgba(229, 9, 20, 0.25);
+}
+
+.status-dot {
+  position: absolute;
+  right: 4px;
+  bottom: 7px;
+  width: 15px;
+  height: 15px;
+  border: 3px solid #12141a;
+  border-radius: 50%;
+  background: #38c978;
+}
+
+.account-summary h2 {
+  overflow: hidden;
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border: 1px solid rgba(229, 9, 20, 0.35);
+  border-radius: 999px;
+  color: #ff7380;
+  background: rgba(229, 9, 20, 0.12);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.member-since {
+  margin: 14px 0 22px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.8rem;
+}
+
+.profile-upload {
+  display: grid;
+  gap: 10px;
+  text-align: left;
+}
+
+.profile-upload input[type="file"] {
+  width: 100%;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.75rem;
+}
+
+.file-label,
+.account-form label {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.account-settings {
+  display: grid;
+  gap: 28px;
+}
+
+.setting-section + .setting-section {
+  padding-top: 28px;
+  border-top: 1px solid rgba(229, 9, 20, 0.35);
+}
+
+.card-heading {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.card-number {
+  color: #ff4e60;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.card-heading h2 {
+  margin-bottom: 4px;
+  font-size: 1.08rem;
+}
+
+.card-heading p {
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 0.78rem;
+}
+
+.account-form {
+  display: grid;
+  gap: 8px;
+}
+
+.account-form input {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 11px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 7px;
+  outline: none;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 0.86rem;
+}
+
+.account-form input:focus {
+  border-color: rgba(229, 9, 20, 0.8);
+  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.12);
+}
+
+.account-button {
+  justify-self: start;
+  padding: 10px 16px;
+  border: 1px solid rgba(229, 9, 20, 0.75);
+  border-radius: 7px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #e50914, #b80710);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-upload:not(.delete-account-form) .account-button {
+  justify-self: center;
+}
+
+.account-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(229, 9, 20, 0.3);
+}
+
+.danger-zone {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(229, 9, 20, 0.28);
+  border-color: rgba(229, 9, 20, 0.35);
+  background: transparent;
+}
+
+.danger-heading {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+.danger-heading h2 {
+  margin-bottom: 4px;
+  color: #ff8791;
+  font-size: 0.92rem;
+}
+
+.danger-heading p {
+  color: rgba(255, 190, 196, 0.68);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.danger-zone .file-label,
+.danger-zone label {
+  text-align: left;
+}
+
+.danger-zone input[type="password"],
+.danger-zone input[type="text"] {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 7px;
+  outline: none;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 0.78rem;
+}
+
+.danger-zone input:focus {
+  border-color: rgba(229, 9, 20, 0.8);
+  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.12);
+}
+
+.danger-zone .danger-button {
+  justify-self: stretch;
+}
+
+.danger-zone .danger-heading h2 {
+  color: #ff8791;
+}
+
+.danger-button {
+  background: transparent;
+  color: #ff8791;
+}
+
+.danger-button:hover {
+  color: #ffffff;
+  background: #b80710;
+}
+
+@media (max-width: 768px) {
+  .account-page {
+    width: min(100% - 32px, 520px);
+    padding: 28px 0 44px;
+  }
+
+  .account-hero h1 {
+    font-size: 1.75rem;
+  }
+
+  .account-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-card {
+    padding: 20px;
+  }
+}

@@ -94,7 +94,7 @@ $globalVer = file_exists('global.css') ? filemtime('global.css') : time();
           <img src="img/logo.jpg" alt="Foto profil" class="profile-avatar">
         </button>
         <div id="profile-dropdown" class="profile-dropdown">
-          <a href="fgpass.php">Setelan Akun</a>
+          <a href="account.php">Setelan Akun</a>
           <a href="logout.php" class="dropdown-logout">Log Out</a>
         </div>
       </div>
@@ -171,7 +171,7 @@ $globalVer = file_exists('global.css') ? filemtime('global.css') : time();
     <p>&copy; 2026 HS15 - Komunitas Keliling Banjar. All rights reserved.</p>
   </footer>
 
-  <script src="nav.js"></script>
+  <script src="nav.js?v=20260918"></script>
 
 </body>
 </html>
