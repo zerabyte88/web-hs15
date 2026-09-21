@@ -1,6 +1,6 @@
-<?php
+﻿<?php
 session_start();
-require 'connect.php';
+require __DIR__ . '/connect.php';
 
 // Pastikan form mengirimkan data
 if (!isset($_POST['email'], $_POST['password'])) {
@@ -27,12 +27,12 @@ if ($result->num_rows === 1) {
 
     // Verifikasi password dengan hash
     if (password_verify($password, $user['password'])) {
-        // Login sukses → simpan session
+        // Login sukses â†’ simpan session
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['email']   = $user['email'];
 
         // Arahkan ke halaman beranda
-        header("Location: choose.html");
+        header("Location: ../html/choose.html");
         exit;
     } else {
         header("Location: index.php?error=invalid_password");

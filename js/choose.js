@@ -2,11 +2,11 @@ let currentIndex = 0;
 let isBkgd1Active = true;
 const slideInterval = 5000;
 const imageUrls = [
-  'img/background-1.webp',
-  'img/background-2.webp',
-  'img/background-3.webp',
-  'img/background-4.webp',
-  'img/background-5.webp',
+  '../img/background-1.webp',
+  '../img/background-2.webp',
+  '../img/background-3.webp',
+  '../img/background-4.webp',
+  '../img/background-5.webp',
 ];
 
 const preloadedImages = [];

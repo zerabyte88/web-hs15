@@ -1,6 +1,6 @@
-<?php
+﻿<?php
 session_start();
-require 'connect.php';
+require __DIR__ . '/connect.php';
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: index.php');
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$imageInfo || !isset($allowedTypes[$imageInfo[2]])) {
                 $errorMessage = 'Format foto harus JPG, PNG, atau WEBP.';
             } else {
-                $profileDir = __DIR__ . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR . 'profiles';
+                $profileDir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR . 'profiles';
                 if (!is_dir($profileDir)) {
                     mkdir($profileDir, 0755, true);
                 }
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $updateStmt->execute();
 
                     if (!empty($user['profile_photo']) && str_starts_with($user['profile_photo'], 'img/profiles/')) {
-                        $oldPath = __DIR__ . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $user['profile_photo']);
+                        $oldPath = dirname(__DIR__) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $user['profile_photo']);
                         if (is_file($oldPath)) {
                             unlink($oldPath);
                         }
@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errorMessage = 'Ketik HAPUS AKUN untuk mengonfirmasi penghapusan.';
           } else {
             if (!empty($user['profile_photo']) && str_starts_with($user['profile_photo'], 'img/profiles/')) {
-              $profilePath = __DIR__ . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $user['profile_photo']);
+              $profilePath = dirname(__DIR__) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $user['profile_photo']);
               if (is_file($profilePath)) {
                 unlink($profilePath);
               }
@@ -156,9 +156,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$profileImage = !empty($user['profile_photo']) && is_file(__DIR__ . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $user['profile_photo']))
-    ? $user['profile_photo']
-    : 'img/logo.jpg';
+$profileImage = !empty($user['profile_photo']) && is_file(dirname(__DIR__) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $user['profile_photo']))
+    ? '../' . $user['profile_photo']
+    : '../img/logo.jpg';
 $role = strtolower($user['role'] ?: 'member');
 $roleLabel = ucfirst($role);
 $createdDate = date('d F Y', strtotime($user['created_at']));
@@ -169,29 +169,29 @@ $createdDate = date('d F Y', strtotime($user['created_at']));
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Setelan Akun - HS15</title>
-  <link rel="stylesheet" href="global.css?v=20260918">
-  <link rel="stylesheet" href="account.css?v=20260918">
-  <link rel="icon" href="img/logo.jpg" type="image/jpeg">
+  <link rel="stylesheet" href="../css/global.css?v=20260918">
+  <link rel="stylesheet" href="../css/account.css?v=20260918">
+  <link rel="icon" href="../img/logo.jpg" type="image/jpeg">
 </head>
 <body>
   <header>
     <nav>
-      <a href="choose.html" class="logo" id="logo-link">
-        <img src="img/logo.jpg" alt="HS15 Logo" class="logo-img">
+      <a href="../html/choose.html" class="logo" id="logo-link">
+        <img src="../img/logo.jpg" alt="HS15 Logo" class="logo-img">
         <span>HS15 - Komunitas Keliling Banjar</span>
       </a>
       <ul id="menu" class="nav-main">
-        <li><a href="choose.html">Beranda</a></li>
-        <li><a href="gallery.php">Foto</a></li>
-        <li><a href="vidgallery.php">Video</a></li>
+        <li><a href="../html/choose.html">Beranda</a></li>
+        <li><a href="../php/gallery.php">Foto</a></li>
+        <li><a href="../php/vidgallery.php">Video</a></li>
       </ul>
       <div class="profile-menu">
         <button type="button" class="profile-button" aria-expanded="false" aria-controls="profile-dropdown" title="Menu akun">
           <img src="<?= htmlspecialchars($profileImage) ?>" alt="Foto profil" class="profile-avatar">
         </button>
         <div id="profile-dropdown" class="profile-dropdown">
-          <a href="account.php">Setelan Akun</a>
-          <a href="logout.php" class="dropdown-logout">Log Out</a>
+          <a href="../php/account.php">Setelan Akun</a>
+          <a href="../php/logout.php" class="dropdown-logout">Log Out</a>
         </div>
       </div>
     </nav>
@@ -284,6 +284,6 @@ $createdDate = date('d F Y', strtotime($user['created_at']));
   <footer class="main-footer">
     <p>&copy; 2026 HS15 - Komunitas Keliling Banjar. All rights reserved.</p>
   </footer>
-  <script src="nav.js?v=20260918"></script>
+  <script src="../js/nav.js?v=20260918"></script>
 </body>
 </html>

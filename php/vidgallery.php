@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 function formatMediaCaption($filename) {
     $base = pathinfo($filename, PATHINFO_FILENAME);
     // Format timestamp: VID_YYYYMMDD_HHMMSS atau video_YYYYMMDD_HHMMSS
@@ -32,17 +32,15 @@ function formatMediaCaption($filename) {
     return ucwords(str_replace(['_', '-'], ' ', $base));
 }
 
-$dir = __DIR__ . DIRECTORY_SEPARATOR . "gallery" . DIRECTORY_SEPARATOR;
-$cacheFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'vidgallery_cache_' . md5($dir) . '.json';
-$cacheTime = 1800; // 30 menit
-
-if (file_exists($cacheFile) && (time() - filemtime($cacheFile) < $cacheTime)) {
-    $vid = json_decode(file_get_contents($cacheFile), true);
-} else {
-    $vid = glob($dir . "*.{webm,mp4,ogg}", GLOB_BRACE);
-    if ($vid === false) $vid = [];
-    @file_put_contents($cacheFile, json_encode($vid));
+$dir = __DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "gallery" . DIRECTORY_SEPARATOR;
+$vid = [];
+foreach (['mp4', 'webm', 'ogg', 'm4v'] as $extension) {
+  $matches = glob($dir . '*.' . $extension);
+  if ($matches !== false) {
+    $vid = array_merge($vid, $matches);
+  }
 }
+$vid = array_values(array_unique($vid));
 
 if ($vid) {
     usort($vid, fn($a, $b) => filemtime($b) <=> filemtime($a));
@@ -60,9 +58,9 @@ if (!is_dir($thumbDir)) {
     @mkdir($thumbDir, 0755, true);
 }
 
-$cssVer = file_exists('vidgallery.css') ? filemtime('vidgallery.css') : time();
-$jsVer  = file_exists('vidgallery.js') ? filemtime('vidgallery.js') : time();
-$globalVer = file_exists('global.css') ? filemtime('global.css') : time();
+$cssVer = file_exists(__DIR__ . '/../css/vidgallery.css') ? filemtime(__DIR__ . '/../css/vidgallery.css') : time();
+$jsVer  = file_exists(__DIR__ . '/../js/vidgallery.js') ? filemtime(__DIR__ . '/../js/vidgallery.js') : time();
+$globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '/../css/global.css') : time();
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -70,32 +68,32 @@ $globalVer = file_exists('global.css') ? filemtime('global.css') : time();
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Galeri Video - HS15</title>
-  <link rel="stylesheet" href="global.css?v=<?= $globalVer ?>">
-  <link rel="stylesheet" href="vidgallery.css?v=<?= $cssVer ?>">
-  <link rel="icon" href="img/logo.jpg" type="image/jpeg">
-  <script src="vidgallery.js?v=<?= $jsVer ?>" defer></script>
+  <link rel="stylesheet" href="../css/global.css?v=<?= $globalVer ?>">
+  <link rel="stylesheet" href="../css/vidgallery.css?v=<?= $cssVer ?>">
+  <link rel="icon" href="../img/logo.jpg" type="image/jpeg">
+  <script src="../js/vidgallery.js?v=<?= $jsVer ?>" defer></script>
 </head>
 <body>
 
   <!-- Header Navigasi -->
   <header>
     <nav>
-      <a href="choose.html" class="logo" id="logo-link">
-        <img src="img/logo.jpg" alt="HS15 Logo" class="logo-img">
+      <a href="../html/choose.html" class="logo" id="logo-link">
+        <img src="../img/logo.jpg" alt="HS15 Logo" class="logo-img">
         <span>HS15 - Komunitas Keliling Banjar</span>
       </a>
       <ul id="menu" class="nav-main">
-        <li><a href="choose.html">Beranda</a></li>
-        <li><a href="gallery.php">Foto</a></li>
-        <li><a href="vidgallery.php" class="nav-active">Video</a></li>
+        <li><a href="../html/choose.html">Beranda</a></li>
+        <li><a href="../php/gallery.php">Foto</a></li>
+        <li><a href="../php/vidgallery.php" class="nav-active">Video</a></li>
       </ul>
       <div class="profile-menu">
         <button type="button" class="profile-button" aria-expanded="false" aria-controls="profile-dropdown" title="Menu akun">
-          <img src="img/logo.jpg" alt="Foto profil" class="profile-avatar">
+          <img src="../img/logo.jpg" alt="Foto profil" class="profile-avatar">
         </button>
         <div id="profile-dropdown" class="profile-dropdown">
-          <a href="account.php">Setelan Akun</a>
-          <a href="logout.php" class="dropdown-logout">Log Out</a>
+          <a href="../php/account.php">Setelan Akun</a>
+          <a href="../php/logout.php" class="dropdown-logout">Log Out</a>
         </div>
       </div>
     </nav>
@@ -118,7 +116,7 @@ $globalVer = file_exists('global.css') ? filemtime('global.css') : time();
 
           // Cek ketersediaan thumbnail
           if (file_exists($targetThumb)) {
-              $thumbPath = 'gallery/thumbs/' . rawurlencode($nameWithoutExt . '.jpg');
+              $thumbPath = '../gallery/thumbs/' . rawurlencode($nameWithoutExt . '.jpg');
           } else {
               $ffmpegPath = __DIR__ . DIRECTORY_SEPARATOR . 'ffmpeg.exe';
               if (file_exists($ffmpegPath)) {
@@ -126,12 +124,12 @@ $globalVer = file_exists('global.css') ? filemtime('global.css') : time();
                   $cmd = "\"$ffmpegPath\" -i \"$videoPath\" -ss 00:00:02.000 -vframes 1 \"$targetThumb\" -y 2>&1";
                   @shell_exec($cmd);
                   if (file_exists($targetThumb)) {
-                      $thumbPath = 'gallery/thumbs/' . rawurlencode($nameWithoutExt . '.jpg');
+                      $thumbPath = '../gallery/thumbs/' . rawurlencode($nameWithoutExt . '.jpg');
                   }
               }
           }
 
-          $videoSrc = 'gallery/' . rawurlencode($file);
+          $videoSrc = '../gallery/' . rawurlencode($file);
         ?>
           <div class="vWrap">
             <div class="video-box">
@@ -149,18 +147,24 @@ $globalVer = file_exists('global.css') ? filemtime('global.css') : time();
     </div>
 
     <!-- Pagination -->
-    <?php if ($pages > 1): ?>
+    <?php if ($pages > 0): ?>
     <div class="pagination">
       <?php if ($page > 1): ?>
-        <a href="?page=1" class="page-btn page-edge" title="Halaman Pertama">« Pertama</a>
-        <a href="?page=<?= $page - 1 ?>" class="page-btn" title="Halaman Sebelumnya">‹ Sebelumnya</a>
+        <a href="?page=1" class="page-btn page-edge" title="Halaman Pertama">&laquo; Pertama</a>
+        <a href="?page=<?= $page - 1 ?>" class="page-btn" title="Halaman Sebelumnya">&lsaquo; Sebelumnya</a>
+      <?php else: ?>
+        <span class="page-btn page-edge is-disabled" aria-disabled="true">&laquo; Pertama</span>
+        <span class="page-btn is-disabled" aria-disabled="true">&lsaquo; Sebelumnya</span>
       <?php endif; ?>
       
       <span class="page-info">Halaman <?= $page ?> dari <?= $pages ?></span>
       
       <?php if ($page < $pages): ?>
-        <a href="?page=<?= $page + 1 ?>" class="page-btn" title="Halaman Selanjutnya">Selanjutnya ›</a>
-        <a href="?page=<?= $pages ?>" class="page-btn page-edge" title="Halaman Terakhir">Akhir »</a>
+        <a href="?page=<?= $page + 1 ?>" class="page-btn" title="Halaman Selanjutnya">Selanjutnya &rsaquo;</a>
+        <a href="?page=<?= $pages ?>" class="page-btn page-edge" title="Halaman Terakhir">Akhir &raquo;</a>
+      <?php else: ?>
+        <span class="page-btn is-disabled" aria-disabled="true">Selanjutnya &rsaquo;</span>
+        <span class="page-btn page-edge is-disabled" aria-disabled="true">Akhir &raquo;</span>
       <?php endif; ?>
     </div>
     <?php endif; ?>
@@ -171,7 +175,7 @@ $globalVer = file_exists('global.css') ? filemtime('global.css') : time();
     <p>&copy; 2026 HS15 - Komunitas Keliling Banjar. All rights reserved.</p>
   </footer>
 
-  <script src="nav.js?v=20260918"></script>
+  <script src="../js/nav.js?v=20260918"></script>
 
 </body>
 </html>

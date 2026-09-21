@@ -1,6 +1,6 @@
-<?php
+﻿<?php
 session_start();
-require 'connect.php';
+require __DIR__ . '/connect.php';
 
 $error_message = '';
 $email_val = '';
@@ -50,9 +50,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8">
   <title>Daftar Akun - HS15</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="background.css">
-  <link rel="stylesheet" href="auth.css">
-  <link rel="icon" href="img/logo.jpg" type="image/jpeg">
+  <link rel="stylesheet" href="../css/background.css">
+  <link rel="stylesheet" href="../css/auth.css">
+  <link rel="icon" href="../img/logo.jpg" type="image/jpeg">
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </head>
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <section class="auth-container">
     <div class="auth-card">
       <div class="auth-header">
-        <img src="img/logo.jpg" alt="HS15 Logo" class="auth-logo">
+        <img src="../img/logo.jpg" alt="HS15 Logo" class="auth-logo">
         <h2>Buat Akun Baru</h2>
         <p class="auth-subtitle">Bergabung bersama komunitas dokumentasi HS15</p>
       </div>
@@ -120,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </section>
 
-  <script src="auth.js"></script>
-  <script src="choose.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/choose.js"></script>
 </body>
 </html>

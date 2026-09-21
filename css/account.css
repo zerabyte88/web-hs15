@@ -1,4 +1,4 @@
-.account-page {
+﻿.account-page {
   width: min(1100px, calc(100% - 40px));
   margin: 0 auto;
   padding: 42px 0 64px;
@@ -299,3 +299,4 @@
     padding: 20px;
   }
 }
+

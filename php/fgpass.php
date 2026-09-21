@@ -1,6 +1,6 @@
-<?php
+﻿<?php
 session_start();
-require_once 'connect.php';
+require_once __DIR__ . '/connect.php';
 
 $step = 1; // Default step 1
 $email = '';
@@ -73,9 +73,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reset Password - HS15</title>
-  <link rel="stylesheet" href="background.css">
-  <link rel="stylesheet" href="auth.css">
-  <link rel="icon" href="img/logo.jpg" type="image/jpeg">
+  <link rel="stylesheet" href="../css/background.css">
+  <link rel="stylesheet" href="../css/auth.css">
+  <link rel="icon" href="../img/logo.jpg" type="image/jpeg">
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </head>
@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <section class="auth-container">
     <div class="auth-card">
       <div class="auth-header">
-        <img src="img/logo.jpg" alt="HS15 Logo" class="auth-logo">
+        <img src="../img/logo.jpg" alt="HS15 Logo" class="auth-logo">
         <?php if ($step == 3): ?>
           <h2>Selesai!</h2>
           <p class="auth-subtitle">Password akun Anda telah berhasil diganti</p>
@@ -152,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </button>
 
           <div class="auth-footer">
-            <p><a href="fgpass.php">Batal & Ulangi dari Awal</a></p>
+            <p><a href="../php/fgpass.php">Batal & Ulangi dari Awal</a></p>
           </div>
         </form>
 
@@ -182,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </section>
 
-  <script src="auth.js"></script>
-  <script src="choose.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/choose.js"></script>
 </body>
 </html>

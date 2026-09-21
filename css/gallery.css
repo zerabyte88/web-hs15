@@ -1,4 +1,4 @@
-/* gallery.css - Minimalist Photo Gallery Styling */
+﻿/* gallery.css - Minimalist Photo Gallery Styling */
 
 .page-container {
   max-width: 1400px;
@@ -256,6 +256,7 @@
 .page-btn {
   display: inline-flex;
   align-items: center;
+  min-height: 37px;
   padding: 8px 18px;
   border-radius: 20px;
   text-decoration: none;
@@ -274,6 +275,12 @@
   transform: translateY(-1px);
 }
 
+.page-btn.is-disabled {
+  opacity: 0.42;
+  cursor: default;
+  pointer-events: none;
+}
+
 .page-edge {
   background: rgba(255, 255, 255, 0.03);
   color: rgba(255, 255, 255, 0.7);
@@ -285,3 +292,42 @@
   padding: 0 10px;
   font-weight: 500;
 }
+
+@media (max-width: 480px) {
+  .pagination {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, max-content));
+    justify-content: center;
+    gap: 8px 8px;
+    margin-top: 28px;
+  }
+
+  .pagination .page-btn {
+    width: 100%;
+    min-height: 32px;
+    padding: 6px 10px;
+    border-radius: 16px;
+    font-size: 0.72rem;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .pagination .page-info {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    padding: 1px 4px;
+    font-size: 0.76rem;
+    text-align: center;
+  }
+
+  .pagination .page-btn:nth-child(4) {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .pagination .page-btn:nth-child(5) {
+    grid-column: 2;
+    grid-row: 3;
+  }
+}
+

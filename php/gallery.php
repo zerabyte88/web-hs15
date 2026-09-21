@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 function formatMediaCaption($filename) {
     $base = pathinfo($filename, PATHINFO_FILENAME);
     // Format timestamp: IMG_YYYYMMDD_HHMMSS atau VID_YYYYMMDD_HHMMSS
@@ -64,7 +64,7 @@ function makeThumbnail($src, $dest, $thumbWidth = 400) {
     return true;
 }
 
-$dir = __DIR__ . "/gallery/";
+$dir = __DIR__ . "/../gallery/";
 $thumbDir = $dir . "thumbs/";
 if (!is_dir($thumbDir)) mkdir($thumbDir, 0755, true);
 
@@ -80,9 +80,9 @@ $pages = ceil($total / $perPage);
 $start = ($page - 1) * $perPage;
 $images = array_slice($allImages, $start, $perPage);
 
-$cssVer = file_exists('gallery.css') ? filemtime('gallery.css') : time();
-$jsVer  = file_exists('gallery.js') ? filemtime('gallery.js') : time();
-$globalVer = file_exists('global.css') ? filemtime('global.css') : time();
+$cssVer = file_exists(__DIR__ . '/../css/gallery.css') ? filemtime(__DIR__ . '/../css/gallery.css') : time();
+$jsVer  = file_exists(__DIR__ . '/../js/gallery.js') ? filemtime(__DIR__ . '/../js/gallery.js') : time();
+$globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '/../css/global.css') : time();
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -90,32 +90,32 @@ $globalVer = file_exists('global.css') ? filemtime('global.css') : time();
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Galeri Foto - HS15</title>
-  <link rel="stylesheet" href="global.css?v=<?= $globalVer ?>">
-  <link rel="stylesheet" href="gallery.css?v=<?= $cssVer ?>">
-  <link rel="icon" href="img/logo.jpg" type="image/jpeg">
-  <script src="gallery.js?v=<?= $jsVer ?>" defer></script>
+  <link rel="stylesheet" href="../css/global.css?v=<?= $globalVer ?>">
+  <link rel="stylesheet" href="../css/gallery.css?v=<?= $cssVer ?>">
+  <link rel="icon" href="../img/logo.jpg" type="image/jpeg">
+  <script src="../js/gallery.js?v=<?= $jsVer ?>" defer></script>
 </head>
 <body>
 
   <!-- Header Navigasi -->
   <header>
     <nav>
-      <a href="choose.html" class="logo" id="logo-link">
-        <img src="img/logo.jpg" alt="HS15 Logo" class="logo-img">
+      <a href="../html/choose.html" class="logo" id="logo-link">
+        <img src="../img/logo.jpg" alt="HS15 Logo" class="logo-img">
         <span>HS15 - Komunitas Keliling Banjar</span>
       </a>
       <ul id="menu" class="nav-main">
-        <li><a href="choose.html">Beranda</a></li>
-        <li><a href="gallery.php" class="nav-active">Foto</a></li>
-        <li><a href="vidgallery.php">Video</a></li>
+        <li><a href="../html/choose.html">Beranda</a></li>
+        <li><a href="../php/gallery.php" class="nav-active">Foto</a></li>
+        <li><a href="../php/vidgallery.php">Video</a></li>
       </ul>
       <div class="profile-menu">
         <button type="button" class="profile-button" aria-expanded="false" aria-controls="profile-dropdown" title="Menu akun">
-          <img src="img/logo.jpg" alt="Foto profil" class="profile-avatar">
+          <img src="../img/logo.jpg" alt="Foto profil" class="profile-avatar">
         </button>
         <div id="profile-dropdown" class="profile-dropdown">
-          <a href="account.php">Setelan Akun</a>
-          <a href="logout.php" class="dropdown-logout">Log Out</a>
+          <a href="../php/account.php">Setelan Akun</a>
+          <a href="../php/logout.php" class="dropdown-logout">Log Out</a>
         </div>
       </div>
     </nav>
@@ -138,9 +138,9 @@ $globalVer = file_exists('global.css') ? filemtime('global.css') : time();
             makeThumbnail($i, $thumbPath, 600);
           }
           $displayThumb = file_exists($thumbPath) 
-            ? 'gallery/thumbs/' . rawurlencode($img) 
-            : 'gallery/' . rawurlencode($img);
-          $fullSrc = 'gallery/' . rawurlencode($img);
+            ? '../gallery/thumbs/' . rawurlencode($img) 
+            : '../gallery/' . rawurlencode($img);
+          $fullSrc = '../gallery/' . rawurlencode($img);
         ?>
           <figure class="gallery-item" data-index="<?= $index ?>" data-full="<?= $fullSrc ?>" data-caption="<?= htmlspecialchars($formattedCaption) ?>">
             <img src="<?= $displayThumb ?>" 
@@ -156,18 +156,24 @@ $globalVer = file_exists('global.css') ? filemtime('global.css') : time();
     </div>
 
     <!-- Pagination Modern -->
-    <?php if ($pages > 1): ?>
+    <?php if ($pages > 0): ?>
     <div class="pagination">
       <?php if ($page > 1): ?>
-        <a href="?page=1" class="page-btn page-edge" title="Halaman Pertama">« Pertama</a>
-        <a href="?page=<?= $page - 1 ?>" class="page-btn" title="Halaman Sebelumnya">‹ Sebelumnya</a>
+        <a href="?page=1" class="page-btn page-edge" title="Halaman Pertama">&laquo; Pertama</a>
+        <a href="?page=<?= $page - 1 ?>" class="page-btn" title="Halaman Sebelumnya">&lsaquo; Sebelumnya</a>
+      <?php else: ?>
+        <span class="page-btn page-edge is-disabled" aria-disabled="true">&laquo; Pertama</span>
+        <span class="page-btn is-disabled" aria-disabled="true">&lsaquo; Sebelumnya</span>
       <?php endif; ?>
       
       <span class="page-info">Halaman <?= $page ?> dari <?= $pages ?></span>
       
       <?php if ($page < $pages): ?>
-        <a href="?page=<?= $page + 1 ?>" class="page-btn" title="Halaman Selanjutnya">Selanjutnya ›</a>
-        <a href="?page=<?= $pages ?>" class="page-btn page-edge" title="Halaman Terakhir">Akhir »</a>
+        <a href="?page=<?= $page + 1 ?>" class="page-btn" title="Halaman Selanjutnya">Selanjutnya &rsaquo;</a>
+        <a href="?page=<?= $pages ?>" class="page-btn page-edge" title="Halaman Terakhir">Akhir &raquo;</a>
+      <?php else: ?>
+        <span class="page-btn is-disabled" aria-disabled="true">Selanjutnya &rsaquo;</span>
+        <span class="page-btn page-edge is-disabled" aria-disabled="true">Akhir &raquo;</span>
       <?php endif; ?>
     </div>
     <?php endif; ?>
@@ -178,15 +184,15 @@ $globalVer = file_exists('global.css') ? filemtime('global.css') : time();
     <p>&copy; 2026 HS15 - Komunitas Keliling Banjar. All rights reserved.</p>
   </footer>
 
-  <script src="nav.js?v=20260918"></script>
+  <script src="../js/nav.js?v=20260918"></script>
 
   <!-- Lightbox Modal Fullscreen -->
   <div id="lightbox" class="lightbox" role="dialog" aria-modal="true">
     <div class="lightbox__backdrop"></div>
     
     <button id="closeBtn" class="lightbox__close" title="Tutup (Esc)">&times;</button>
-    <button id="prevBtn" class="lightbox__prev" title="Sebelumnya (Panah Kiri)">‹</button>
-    <button id="nextBtn" class="lightbox__next" title="Selanjutnya (Panah Kanan)">›</button>
+    <button id="prevBtn" class="lightbox__prev" title="Sebelumnya (Panah Kiri)">&lsaquo;</button>
+    <button id="nextBtn" class="lightbox__next" title="Selanjutnya (Panah Kanan)">&rsaquo;</button>
 
     <figure class="lightbox__figure">
       <img id="lightboxImg" class="lightbox__img" src="" alt="">

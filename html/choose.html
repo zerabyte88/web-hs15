@@ -1,13 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HS15 - Jelajahi Galeri</title>
-  <link rel="stylesheet" href="background.css?v=20260918">
-  <link rel="stylesheet" href="global.css?v=20260918">
-  <link rel="stylesheet" href="choose.css?v=20260918">
-  <link rel="icon" href="img/logo.jpg" type="image/jpeg">
+  <link rel="stylesheet" href="../css/background.css?v=20260918">
+  <link rel="stylesheet" href="../css/global.css?v=20260918">
+  <link rel="stylesheet" href="../css/choose.css?v=20260918">
+  <link rel="icon" href="../img/logo.jpg" type="image/jpeg">
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </head>
@@ -17,21 +17,21 @@
   <header>
     <nav>
       <a href="choose.html" class="logo" id="logo-link">
-        <img src="img/logo.jpg" alt="HS15 Logo" class="logo-img">
+        <img src="../img/logo.jpg" alt="HS15 Logo" class="logo-img">
         <span>HS15 - Komunitas Keliling Banjar</span>
       </a>
       <ul id="menu" class="nav-main">
         <li><a href="choose.html" class="nav-active">Beranda</a></li>
-        <li><a href="gallery.php">Foto</a></li>
-        <li><a href="vidgallery.php">Video</a></li>
+        <li><a href="../php/gallery.php">Foto</a></li>
+        <li><a href="../php/vidgallery.php">Video</a></li>
       </ul>
       <div class="profile-menu">
         <button type="button" class="profile-button" aria-expanded="false" aria-controls="profile-dropdown" title="Menu akun">
-          <img src="img/logo.jpg" alt="Foto profil" class="profile-avatar">
+          <img src="../img/logo.jpg" alt="Foto profil" class="profile-avatar">
         </button>
         <div id="profile-dropdown" class="profile-dropdown">
-          <a href="account.php">Setelan Akun</a>
-          <a href="logout.php" class="dropdown-logout">Log Out</a>
+          <a href="../php/account.php">Setelan Akun</a>
+          <a href="../php/logout.php" class="dropdown-logout">Log Out</a>
         </div>
       </div>
     </nav>
@@ -50,7 +50,7 @@
     </div>
 
     <div class="menu">
-      <a href="gallery.php" class="card">
+      <a href="../php/gallery.php" class="card">
         <div class="content">
           <div class="icon">
             <ion-icon name="images-outline"></ion-icon>
@@ -61,7 +61,7 @@
         </div>
       </a>
 
-      <a href="vidgallery.php" class="card">
+      <a href="../php/vidgallery.php" class="card">
         <div class="content">
           <div class="icon">
             <ion-icon name="videocam-outline"></ion-icon>
@@ -80,8 +80,8 @@
   </footer>
 
   <!-- Skrip Slideshow -->
-  <script src="choose.js"></script>
-  <script src="nav.js?v=20260918"></script>
+  <script src="../js/choose.js"></script>
+  <script src="../js/nav.js?v=20260918"></script>
 
 </body>
 </html>

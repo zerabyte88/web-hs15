@@ -1,129 +1,150 @@
-# 🖼️ HS15 Web Gallery
+# HS15 Web Gallery
 
-> Arsip digital foto dan video untuk mendokumentasikan momen kebersamaan serta perjalanan Komunitas HS15 - Komunitas Keliling Banjar.
+> A PHP-based digital archive for the photos and videos of HS15 - Komunitas Keliling Banjar.
 
 ![Status](https://img.shields.io/badge/status-active-2f855a?style=flat-square)
 ![PHP](https://img.shields.io/badge/PHP-8%2B-777bb4?style=flat-square&logo=php&logoColor=white)
 ![Database](https://img.shields.io/badge/MySQL-compatible-4479a1?style=flat-square&logo=mysql&logoColor=white)
 
-## ✨ Tentang Proyek
+## Overview
 
-HS15 Web Gallery adalah aplikasi galeri berbasis PHP yang awalnya dibuat pada 5 Juni 2023 sebagai galeri ilustrasi. Setelah sempat berhenti, proyek ini dilanjutkan dan diarahkan menjadi arsip dokumentasi foto dan video Komunitas HS15.
+HS15 Web Gallery is a lightweight photo and video archive built with plain PHP, HTML, CSS, and JavaScript. It was originally created as an illustration gallery and has since been redesigned as a private documentation space for the HS15 community.
 
-Tampilan aplikasi terinspirasi dari situs galeri modern, dengan fokus pada navigasi sederhana, akses media yang nyaman, dan pengelolaan akun pengguna.
+The current project is organized into separate frontend, backend, media, and static-page directories. The interface focuses on simple navigation, responsive layouts, account management, and convenient media viewing.
 
-## 🚀 Fitur
+## Features
 
-- 🔐 **Autentikasi pengguna**: daftar akun, login, logout, dan reset password.
-- 🏠 **Beranda galeri**: akses cepat menuju galeri foto dan video.
-- 📸 **Galeri foto**: thumbnail otomatis, caption dari nama file, pagination, dan lightbox fullscreen.
-- 🎬 **Galeri video**: pemutar video bawaan browser, poster thumbnail, dan pagination.
-- 👤 **Setelan akun**: ganti foto profil, email, password, serta hapus akun.
-- 🛡️ **Keamanan dasar**: password disimpan menggunakan `password_hash()` dan query database menggunakan prepared statement.
-- 📱 **Tampilan responsif**: tersedia stylesheet terpisah untuk halaman autentikasi, galeri, akun, dan navigasi.
+- User registration, login, logout, and password reset.
+- A post-login home page with direct access to the photo and video galleries.
+- Photo gallery with automatic PHP GD thumbnails, filename-based captions, pagination, and a fullscreen lightbox.
+- Video gallery with native HTML5 controls, optional FFmpeg poster thumbnails, portrait-video support, and pagination.
+- Account settings for changing the profile photo, email address, and password.
+- Permanent account deletion with password and confirmation checks.
+- Password hashing with `password_hash()` and prepared statements for database queries.
+- Responsive styles for authentication, navigation, galleries, and account pages.
 
-## 🧰 Teknologi
+## Tech Stack
 
-| Komponen | Teknologi |
+| Area | Technology |
 | --- | --- |
-| Backend | PHP 8 atau lebih baru |
-| Database | MySQL / MariaDB |
-| Frontend | HTML, CSS, JavaScript |
-| Pemrosesan gambar | PHP GD |
-| Ikon | Ionicons melalui CDN |
-| Server lokal | Laragon atau web server PHP lain |
-| Thumbnail video | FFmpeg (opsional) |
+| Backend | PHP 8 or newer |
+| Database | MySQL or MariaDB |
+| Frontend | HTML, CSS, and vanilla JavaScript |
+| Image processing | PHP GD |
+| Icons | Ionicons via CDN |
+| Local server | Laragon, XAMPP, WAMP, or Apache/Nginx |
+| Video thumbnails | FFmpeg (optional) |
 
-## 📁 Struktur Folder
+## Project Structure
 
 ```text
-project-root/
-├── account.php          # Setelan dan pengelolaan akun
-├── connect.php          # Konfigurasi koneksi database
-├── fgpass.php           # Reset password
-├── gallery.php          # Galeri foto
-├── index.php            # Halaman login
-├── login.php            # Proses login
-├── logout.php           # Proses logout
-├── register.php         # Pendaftaran akun
-├── vidgallery.php       # Galeri video
-├── choose.html          # Beranda setelah login
-├── *.css                # Style tiap halaman
-├── *.js                 # Interaksi frontend dan navigasi
-├── gallery/             # File foto dan video
-│   └── thumbs/          # Thumbnail yang dibuat otomatis
+project_hs15/
+├── index.php              # Root entry point; redirects to php/index.php
+├── css/                   # Page-specific and shared stylesheets
+├── js/                    # Gallery, authentication, and navigation scripts
+├── html/
+│   ├── choose.html        # Post-login home page
+│   └── index.html         # Static login redirect page
+├── php/
+│   ├── index.php          # Login page
+│   ├── register.php       # Registration page and handler
+│   ├── fgpass.php         # Password reset page and handler
+│   ├── login.php          # Login handler
+│   ├── logout.php         # Logout handler
+│   ├── account.php        # Account settings and deletion
+│   ├── gallery.php        # Photo gallery and image thumbnails
+│   ├── vidgallery.php     # Video gallery and poster thumbnails
+│   ├── profile_image.php  # Profile image endpoint
+│   └── connect.php        # Database connection configuration
+├── gallery/               # Uploaded photos and videos
+│   └── thumbs/            # Generated image and video thumbnails
 └── img/
-    └── profiles/        # Foto profil pengguna
+	└── profiles/          # Uploaded profile photos
 ```
 
-## ✅ Persyaratan
+## Requirements
 
-Pastikan perangkat sudah memiliki:
+- A local PHP web server such as Laragon, XAMPP, or WAMP.
+- MySQL or MariaDB.
+- PHP 8+ with the `mysqli` and `gd` extensions enabled.
+- A modern browser with HTML5 video support.
+- FFmpeg only if automatic video poster thumbnails are required.
 
-- Web server lokal seperti **Laragon**, **XAMPP**, **WAMP**, atau konfigurasi Apache/Nginx setara.
-- MySQL atau MariaDB yang sedang berjalan.
-- PHP 8+ dengan ekstensi `mysqli` dan `gd` aktif.
-- Browser modern yang mendukung pemutar video HTML5.
-- FFmpeg jika ingin membuat thumbnail video secara otomatis.
+## Installation
 
-## 🛠️ Instalasi
-
-1. Salin seluruh folder proyek ke **document root** web server lokal yang digunakan. Contohnya adalah folder `htdocs`, `www`, atau folder root lain sesuai konfigurasi server.
-2. Jalankan layanan **web server** dan **MySQL/MariaDB**.
-3. Buat satu database kosong melalui phpMyAdmin, HeidiSQL, Adminer, atau perangkat administrasi database lain.
-4. Pilih database tersebut, lalu buat tabel pengguna dengan SQL berikut:
+1. Place the project inside your web server document root, such as Laragon's `www` directory.
+2. Start the web server and MySQL/MariaDB.
+3. Create an empty database using phpMyAdmin, HeidiSQL, Adminer, or another database tool.
+4. Select the database and create the base `users` table:
 
 ```sql
 CREATE TABLE users (
 	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 	email VARCHAR(255) NOT NULL UNIQUE,
-	password VARCHAR(255) NOT NULL,
-	profile_photo VARCHAR(255) NULL,
-	role VARCHAR(30) NOT NULL DEFAULT 'member',
-	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+	password VARCHAR(255) NOT NULL
 );
 ```
 
-5. Buka `connect.php`, lalu sesuaikan host, username, password, dan nama database dengan konfigurasi lokal Anda:
+5. Update the connection values in `php/connect.php`:
 
 ```php
-$host = "alamat-host-database";
-$user = "username-database";
-$pass = "password-database";
-$db   = "nama-database";
+$host = "localhost";
+$user = "root";
+$pass = "";
+$db   = "azyuca";
 ```
 
-6. Buka alamat lokal proyek melalui browser, misalnya `http://localhost/nama-folder-proyek/`.
+The default values match a typical Laragon installation. `php/account.php` can add the `profile_photo`, `role`, and `created_at` columns when they are missing, but the base `users` table must exist first.
 
-> 💡 `account.php` juga dapat menambahkan kolom akun yang belum tersedia secara otomatis, tetapi pembuatan tabel dasar tetap perlu dilakukan terlebih dahulu.
-
-## 🗂️ Menambahkan Media
-
-### Foto
-
-Simpan foto dengan format `JPG`, `JPEG`, `PNG`, `GIF`, atau `WEBP` ke folder `gallery/`. Thumbnail akan dibuat otomatis di `gallery/thumbs/` saat galeri dibuka.
-
-### Video
-
-Simpan video dengan format `MP4`, `WEBM`, atau `OGG` ke folder `gallery/`. Jika ingin menampilkan poster thumbnail, letakkan `ffmpeg.exe` di folder utama proyek. Tanpa FFmpeg, video tetap dapat diputar tetapi tidak memiliki thumbnail otomatis.
-
-Nama file bertimestamp seperti `IMG_20240915_103000.jpg` atau `VID_20240915_103000.mp4` akan ditampilkan sebagai caption tanggal dan waktu.
-
-## 🧭 Alur Penggunaan
+6. Open the project in a browser, for example:
 
 ```text
-Daftar akun -> Login -> Beranda
-                       ├── Galeri Foto
-                       ├── Galeri Video
-                       └── Setelan Akun
+http://localhost/project_hs15/
 ```
 
-## 📝 Catatan Pengembangan
+Laragon users may also use a configured virtual host such as `http://project_hs15.test/`.
 
-- Jangan menyimpan file rahasia atau kredensial produksi di repository.
-- Pastikan folder `gallery/` dan `img/profiles/` memiliki izin tulis agar thumbnail serta foto profil dapat dibuat.
-- Untuk deployment publik, gunakan password database yang kuat dan nonaktifkan konfigurasi development yang tidak diperlukan.
+## Adding Media
 
-## 📄 Lisensi
+### Photos
 
-Proyek ini dibuat untuk kebutuhan dokumentasi Komunitas HS15. Aturan penggunaan dan distribusi dapat ditambahkan sesuai kesepakatan pemilik proyek.
+Put `JPG`, `JPEG`, `PNG`, `GIF`, or `WEBP` files in `gallery/`. Image thumbnails are generated in `gallery/thumbs/` when the photo gallery is opened. The gallery displays up to 16 photos per page.
+
+### Videos
+
+Put `MP4`, `WEBM`, `OGG`, or `M4V` files in `gallery/`. To generate poster thumbnails, place `ffmpeg.exe` in `php/`. Videos remain playable without FFmpeg, but no automatic poster image will be generated. The video gallery displays up to 12 videos per page.
+
+Portrait videos keep their original aspect ratio and use a black playback area so that the content is not cropped.
+
+### Filename Captions
+
+Recognized timestamp formats are converted into readable captions:
+
+- `IMG_20240915_103000.jpg` -> `15 September 2024 - 10:30`
+- `VID_20240915_103000.mp4` -> `15 September 2024 - 10:30`
+- `video_20240915_103000.mp4` -> `15 September 2024 - 10:30`
+- `VID-20240915-WA0000.mp4` -> `15 September 2024`
+
+Other filenames are displayed as regular title-cased captions.
+
+## User Flow
+
+```text
+Register -> Login -> Home
+					|-> Photo Gallery
+					|-> Video Gallery
+					`-> Account Settings
+```
+
+Gallery pagination keeps the first, previous, next, and last controls visible for a consistent layout. Unavailable controls are shown in a disabled state, and the layout becomes more compact on mobile screens.
+
+## Development Notes
+
+- Do not commit database passwords or other production secrets.
+- Keep `gallery/` and `img/profiles/` writable so generated thumbnails and profile photos can be stored.
+- Use a strong database password for public deployments.
+- Review and disable development-only configuration before deploying the application publicly.
+
+## License
+
+This project was created for HS15 community documentation. Usage and distribution terms can be added according to the project owner's agreement.

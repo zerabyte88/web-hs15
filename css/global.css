@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
 
 * {
   margin: 0;
@@ -17,7 +17,7 @@ html, body {
 
 body {
   background: linear-gradient(180deg, rgba(11, 13, 18, 0.85) 0%, rgba(11, 13, 18, 0.95) 100%), 
-              url('img/background.jpg') no-repeat center center fixed;
+              url('../img/background.jpg') no-repeat center center fixed;
   background-size: cover;
   padding-top: 76px;
 }

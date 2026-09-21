@@ -1,8 +1,8 @@
-document.addEventListener('DOMContentLoaded', function () {
+﻿document.addEventListener('DOMContentLoaded', function () {
   const profileMenus = document.querySelectorAll('.profile-menu');
   const profileAvatars = document.querySelectorAll('.profile-avatar');
 
-  fetch('profile_image.php', { credentials: 'same-origin' })
+  fetch('../php/profile_image.php', { credentials: 'same-origin' })
     .then(function (response) { return response.json(); })
     .then(function (data) {
       if (!data.image) return;
@@ -41,3 +41,4 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 });
+
