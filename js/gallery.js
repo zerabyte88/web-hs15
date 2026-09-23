@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const caption = document.getElementById("caption");
   const counter = document.getElementById("lightboxCounter");
   const closeBtn = document.getElementById("closeBtn");
+  const downloadBtn = document.getElementById("downloadBtn");
   const prevBtn = document.getElementById("prevBtn");
   const nextBtn = document.getElementById("nextBtn");
   const backdrop = document.querySelector(".lightbox__backdrop");
@@ -53,6 +54,12 @@ document.addEventListener("DOMContentLoaded", function () {
     lightboxImg.alt = imgCaption;
     if (caption) caption.textContent = imgCaption;
     if (counter) counter.textContent = (currentIndex + 1) + " / " + figures.length;
+
+    if (downloadBtn) {
+      downloadBtn.href = fullSrc;
+      const filename = decodeURIComponent(fullSrc.split("/").pop());
+      downloadBtn.setAttribute("download", filename);
+    }
   }
 
   function openLightbox(index) {
@@ -65,6 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
     lightbox.classList.remove("open");
     document.body.style.overflow = "";
     lightboxImg.src = "";
+    if (downloadBtn) downloadBtn.href = "";
   }
 
   // Klik figure atau gambar untuk membuka lightbox

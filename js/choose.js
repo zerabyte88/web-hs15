@@ -66,4 +66,54 @@ function startSlideshow() {
   setTimeout(changeBackground, slideInterval);
 }
 
-window.addEventListener('DOMContentLoaded', preloadImages);
+// Animasi counter angka statistik
+function animateValue(elem, start, end, duration) {
+  if (!elem) return;
+  if (start === end) {
+    elem.textContent = end;
+    return;
+  }
+  const range = end - start;
+  let current = start;
+  const increment = end > start ? 1 : -1;
+  const stepTime = Math.abs(Math.floor(duration / (range || 1)));
+  const timer = setInterval(function () {
+    current += increment;
+    elem.textContent = current;
+    if (current === end) {
+      clearInterval(timer);
+    }
+  }, Math.max(stepTime, 25));
+}
+
+// Mengambil data statistik dari backend (jumlah foto & video)
+function loadGalleryStats() {
+  const photoElem = document.getElementById('statPhotos');
+  const videoElem = document.getElementById('statVideos');
+
+  if (!photoElem && !videoElem) return;
+
+  fetch('../php/stats_helper.php')
+    .then((res) => {
+      if (!res.ok) throw new Error('Gagal mengambil statistik');
+      return res.json();
+    })
+    .then((data) => {
+      if (photoElem && typeof data.photos === 'number') {
+        animateValue(photoElem, 0, data.photos, 700);
+      }
+      if (videoElem && typeof data.videos === 'number') {
+        animateValue(videoElem, 0, data.videos, 700);
+      }
+    })
+    .catch((err) => {
+      console.warn('Statistik galeri tidak dapat dimuat:', err);
+      if (photoElem) photoElem.textContent = '0';
+      if (videoElem) videoElem.textContent = '0';
+    });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  preloadImages();
+  loadGalleryStats();
+});

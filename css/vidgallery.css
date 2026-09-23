@@ -1,4 +1,4 @@
-﻿/* vidgallery.css - Grid Video Minimalis & Rapi */
+/* vidgallery.css - Grid Video Minimalis & Rapi */
 
 .page-container {
   max-width: 1400px;
@@ -24,6 +24,38 @@
   color: rgba(255, 255, 255, 0.65);
 }
 
+/* Badge Statistik Galeri Video */
+.gallery-stats-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 6px 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+  font-size: 0.86rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+}
+
+.badge-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge-icon {
+  width: 16px;
+  height: 16px;
+  stroke: #e50914;
+}
+
+.badge-dot {
+  color: rgba(255, 255, 255, 0.3);
+}
+
 /* Grid Video 4 Kolom */
 .gallery {
   display: grid;
@@ -38,15 +70,16 @@
 }
 
 @media (max-width: 768px) {
-  .page-container { padding: 24px 16px 48px; }
-  .gallery-hero { margin-bottom: 24px; }
+  .page-container { padding: 16px 12px 48px; }
+  .gallery-hero { margin-bottom: 20px; }
   .gallery-hero h1 { font-size: 1.75rem; }
   .gallery-hero p { font-size: 0.86rem; line-height: 1.5; }
-  .gallery { grid-template-columns: 1fr; gap: 14px; }
+  .gallery { grid-template-columns: repeat(2, 1fr); gap: 10px; }
 }
 
 @media (max-width: 480px) {
-  .gallery { grid-template-columns: 1fr; gap: 14px; }
+  .page-container { padding: 12px 10px 48px; }
+  .gallery { grid-template-columns: repeat(2, 1fr); gap: 8px; }
 }
 
 /* Kartu Video */
@@ -92,18 +125,81 @@
   background: #000000;
 }
 
-/* Caption */
+/* Footer Kartu Video & Tombol Unduh */
+.vFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(14, 16, 22, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
 .vCaption {
-  padding: 10px 14px;
-  text-align: center;
-  font-size: 0.86rem;
+  flex: 1;
+  text-align: left;
+  font-size: 0.85rem;
   font-weight: 500;
   color: #ffffff;
-  background: rgba(14, 16, 22, 0.9);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.v-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+.v-download-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.v-download-btn:hover {
+  background: #e50914;
+  border-color: #e50914;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(229, 9, 20, 0.35);
+}
+
+@media (max-width: 768px) {
+  .vFooter {
+    padding: 7px 8px;
+    gap: 6px;
+  }
+  .vCaption {
+    font-size: 0.72rem;
+  }
+  .v-download-btn span {
+    display: none;
+  }
+  .v-download-btn {
+    padding: 7px;
+    border-radius: 50%;
+  }
+  .v-download-btn svg {
+    width: 15px;
+    height: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .vFooter {
+    padding: 6px 8px;
+  }
 }
 
 /* Pagination */

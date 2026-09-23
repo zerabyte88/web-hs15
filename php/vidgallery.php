@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 function formatMediaCaption($filename) {
     $base = pathinfo($filename, PATHINFO_FILENAME);
     // Format timestamp: VID_YYYYMMDD_HHMMSS atau video_YYYYMMDD_HHMMSS
@@ -32,7 +32,11 @@ function formatMediaCaption($filename) {
     return ucwords(str_replace(['_', '-'], ' ', $base));
 }
 
+require_once __DIR__ . '/stats_helper.php';
+
 $dir = __DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "gallery" . DIRECTORY_SEPARATOR;
+$stats = getGalleryStats($dir);
+
 $vid = [];
 foreach (['mp4', 'webm', 'ogg', 'm4v'] as $extension) {
   $matches = glob($dir . '*.' . $extension);
@@ -103,6 +107,12 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
     <div class="gallery-hero">
       <h1>Galeri Video</h1>
       <p>Koleksi rekaman dan dokumentasi video kegiatan HS15</p>
+      <div class="gallery-stats-badge">
+        <span class="badge-item">
+          <svg class="badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+          Total <?= $stats['videos'] ?> Video
+        </span>
+      </div>
     </div>
 
     <div class="gallery" id="gallery">
@@ -133,12 +143,22 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
         ?>
           <div class="vWrap">
             <div class="video-box">
-              <video controls preload="none" <?php if ($thumbPath): ?>poster="<?= $thumbPath ?>"<?php endif; ?> playsinline>
+              <video controls preload="none" <?php if ($thumbPath): ?>data-poster="<?= $thumbPath ?>"<?php endif; ?> playsinline>
                 <source src="<?= $videoSrc ?>">
                 Browser Anda tidak mendukung pemutar video.
               </video>
             </div>
-            <div class="vCaption" title="<?= htmlspecialchars($formattedCaption) ?>"><?= htmlspecialchars($formattedCaption) ?></div>
+            <div class="vFooter">
+              <div class="vCaption" title="<?= htmlspecialchars($formattedCaption) ?>"><?= htmlspecialchars($formattedCaption) ?></div>
+              <a href="<?= $videoSrc ?>" download="<?= htmlspecialchars($file) ?>" class="v-download-btn" title="Download Video <?= htmlspecialchars($formattedCaption) ?>">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Unduh</span>
+              </a>
+            </div>
           </div>
         <?php endforeach; ?>
       <?php else: ?>

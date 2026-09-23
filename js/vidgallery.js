@@ -17,10 +17,10 @@ window.addEventListener("scroll", function () {
   lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
 }, { passive: true });
 
-// Pause video lain jika salah satu video diputar
 document.addEventListener("DOMContentLoaded", function () {
   const videos = document.querySelectorAll(".gallery video");
 
+  // Pause video lain jika salah satu video diputar
   videos.forEach(function (video) {
     video.addEventListener("play", function () {
       videos.forEach(function (other) {
@@ -30,4 +30,34 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
   });
+
+  // Lazy loading untuk poster video menggunakan IntersectionObserver
+  const lazyVideos = document.querySelectorAll("video[data-poster]");
+  if ("IntersectionObserver" in window) {
+    const posterObserver = new IntersectionObserver(function (entries, observer) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          const vid = entry.target;
+          if (vid.dataset.poster) {
+            vid.poster = vid.dataset.poster;
+            vid.removeAttribute("data-poster");
+          }
+          observer.unobserve(vid);
+        }
+      });
+    }, {
+      rootMargin: "250px 0px"
+    });
+
+    lazyVideos.forEach(function (vid) {
+      posterObserver.observe(vid);
+    });
+  } else {
+    lazyVideos.forEach(function (vid) {
+      if (vid.dataset.poster) {
+        vid.poster = vid.dataset.poster;
+        vid.removeAttribute("data-poster");
+      }
+    });
+  }
 });

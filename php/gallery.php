@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 function formatMediaCaption($filename) {
     $base = pathinfo($filename, PATHINFO_FILENAME);
     // Format timestamp: IMG_YYYYMMDD_HHMMSS atau VID_YYYYMMDD_HHMMSS
@@ -32,9 +32,12 @@ function formatMediaCaption($filename) {
     return ucwords(str_replace(['_', '-'], ' ', $base));
 }
 
-// Fungsi pembuatan thumbnail
-function makeThumbnail($src, $dest, $thumbWidth = 400) {
-    $info = getimagesize($src);
+// Helper statistik
+require_once __DIR__ . '/stats_helper.php';
+
+// Fungsi pembuatan thumbnail dengan kompresi optimal
+function makeThumbnail($src, $dest, $thumbWidth = 480) {
+    $info = @getimagesize($src);
     if (!$info) return false;
     [$width, $height] = $info;
     $mime = $info['mime'];
@@ -49,7 +52,7 @@ function makeThumbnail($src, $dest, $thumbWidth = 400) {
 
     if (!$image) return false;
 
-    $newHeight = floor($height * ($thumbWidth / $width));
+    $newHeight = max(1, (int) floor($height * ($thumbWidth / $width)));
     $tmp = imagecreatetruecolor($thumbWidth, $newHeight);
     
     if ($mime === 'image/png' || $mime === 'image/webp') {
@@ -58,15 +61,30 @@ function makeThumbnail($src, $dest, $thumbWidth = 400) {
     }
 
     imagecopyresampled($tmp, $image, 0, 0, 0, 0, $thumbWidth, $newHeight, $width, $height);
-    imagejpeg($tmp, $dest, 85);
+
+    $ext = strtolower(pathinfo($dest, PATHINFO_EXTENSION));
+    $saved = false;
+
+    if ($ext === 'webp' && function_exists('imagewebp')) {
+        $saved = imagewebp($tmp, $dest, 78);
+    } elseif ($ext === 'png') {
+        $saved = imagepng($tmp, $dest, 7);
+    } elseif ($ext === 'gif') {
+        $saved = imagegif($tmp, $dest);
+    } else {
+        $saved = imagejpeg($tmp, $dest, 80);
+    }
+
     imagedestroy($image);
     imagedestroy($tmp);
-    return true;
+    return $saved;
 }
 
 $dir = __DIR__ . "/../gallery/";
 $thumbDir = $dir . "thumbs/";
 if (!is_dir($thumbDir)) mkdir($thumbDir, 0755, true);
+
+$stats = getGalleryStats($dir);
 
 $allImages = glob("$dir*.{jpg,jpeg,png,gif,webp}", GLOB_BRACE);
 if ($allImages === false) $allImages = [];
@@ -125,6 +143,12 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
     <div class="gallery-hero">
       <h1>Galeri Foto</h1>
       <p>Koleksi arsip dokumentasi momen kebersamaan dan perjalanan HS15</p>
+      <div class="gallery-stats-badge">
+        <span class="badge-item">
+          <svg class="badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+          Total <?= $stats['photos'] ?> Foto
+        </span>
+      </div>
     </div>
 
     <div class="gallery" id="photoGallery">
@@ -135,7 +159,7 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
           $thumbPath = $thumbDir . $img;
 
           if (!file_exists($thumbPath)) {
-            makeThumbnail($i, $thumbPath, 600);
+            makeThumbnail($i, $thumbPath, 480);
           }
           $displayThumb = file_exists($thumbPath) 
             ? '../gallery/thumbs/' . rawurlencode($img) 
@@ -143,10 +167,21 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
           $fullSrc = '../gallery/' . rawurlencode($img);
         ?>
           <figure class="gallery-item" data-index="<?= $index ?>" data-full="<?= $fullSrc ?>" data-caption="<?= htmlspecialchars($formattedCaption) ?>">
-            <img src="<?= $displayThumb ?>" 
-                 data-full="<?= $fullSrc ?>"
-                 alt="<?= htmlspecialchars($formattedCaption) ?>" 
-                 loading="lazy">
+            <div class="gallery-item__media">
+              <img src="<?= $displayThumb ?>" 
+                   data-full="<?= $fullSrc ?>"
+                   alt="<?= htmlspecialchars($formattedCaption) ?>" 
+                   loading="lazy"
+                   decoding="async"
+                   onload="this.classList.add('loaded')">
+              <a href="<?= $fullSrc ?>" download="<?= htmlspecialchars($img) ?>" class="gallery-download-btn" title="Download Foto Asli" onclick="event.stopPropagation();">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+              </a>
+            </div>
             <figcaption><?= htmlspecialchars($formattedCaption) ?></figcaption>
           </figure>
         <?php endforeach; ?>
@@ -190,6 +225,13 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
   <div id="lightbox" class="lightbox" role="dialog" aria-modal="true">
     <div class="lightbox__backdrop"></div>
     
+    <a id="downloadBtn" class="lightbox__download" href="" download title="Download Foto Asli">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+      </svg>
+    </a>
     <button id="closeBtn" class="lightbox__close" title="Tutup (Esc)">&times;</button>
     <button id="prevBtn" class="lightbox__prev" title="Sebelumnya (Panah Kiri)">&lsaquo;</button>
     <button id="nextBtn" class="lightbox__next" title="Selanjutnya (Panah Kanan)">&rsaquo;</button>
