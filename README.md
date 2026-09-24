@@ -11,7 +11,7 @@
 
 ## 📌 Tentang Proyek
 
-**HS15 Web Gallery** awalnya berawal dari galeri sederhana yang kemudian dirombak total menjadi platform arsip privat komunitas. Dibuat murni menggunakan **PHP Native** dan **MySQL** tanpa framework berat, web ini punya performa gesit, hemat resource, dan mudah dimodifikasi sesuai kebutuhan.
+**HS15 Web Gallery** berawal dari galeri sederhana yang kemudian dikembangkan menjadi platform arsip digital privat komunitas. Dibuat murni menggunakan **PHP Native** dan **MySQL** tanpa framework berat, web ini punya performa gesit, hemat resource, dan mudah dimodifikasi sesuai kebutuhan.
 
 Tampilannya mengusung konsep **Dark Glassmorphism** modern bernuansa merah-hitam, navigasi yang intuitif, serta tata letak yang sudah dioptimalkan agar tetap rapi saat diakses dari layar smartphone.
 
@@ -82,7 +82,9 @@ project_hs15/
 ├── js/                       # Kumpulan script interaktivitas
 │   ├── nav.js                # Logika menu responsif & dropdown titik 3
 │   ├── gallery.js            # Lightbox foto, shortcut keyboard, swipe
-│   └── vidgallery.js         # Kontrol kustom player video
+│   ├── vidgallery.js         # Kontrol kustom player video
+│   ├── auth.js               # Validasi form autentikasi & toggle password
+│   └── choose.js             # Efek hover & animasi kartu beranda
 ├── php/                      # Logika backend & halaman aplikasi
 │   ├── index.php             # Form login akun
 │   ├── register.php          # Form pendaftaran akun baru
@@ -242,9 +244,10 @@ Mau pasang galeri ini biar bisa diakses online bareng teman-teman komunitas? Car
    - **Di Hosting**: Biasanya shared hosting tidak mengizinkan binary kustom. Namun jangan khawatir, video tetap berjalan normal dan sistem akan menggunakan thumbnail poster default yang rapi.
 3. **Keamanan Tambahan di Hosting**:
    Disarankan selalu mengaktifkan sertifikat **SSL (HTTPS)** gratis (seperti Let's Encrypt di cPanel) agar transmisi data login dan streaming media terenkripsi dengan aman.
-   
+
 ---
 
 ## 📜 Lisensi & Catatan Komunitas
 
 Aplikasi ini dikembangkan untuk arsip dan dokumentasi internal keluarga besar komunitas **HS15 (Keliling Banjar)**. Seluruh kenangan dan media yang ada di dalamnya dijaga bersama untuk kebersamaan kita! 🎉
+
