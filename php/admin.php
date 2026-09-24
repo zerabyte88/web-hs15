@@ -970,7 +970,7 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
             <thead>
               <tr>
                 <th style="width: 50px;">ID</th>
-                <th>Pengguna</th>
+                <th class="text-left" style="padding-left: 20px;">Pengguna</th>
                 <th>Peran / Role</th>
                 <th>Bergabung Sejak</th>
                 <th>Kelola Peran & Akun</th>
@@ -985,16 +985,14 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
               ?>
                 <tr>
                   <td><?= $u['id'] ?></td>
-                  <td>
-                    <div style="display:inline-flex; align-items:center; gap:12px; text-align:left;">
-                      <img src="<?= htmlspecialchars($avatar) ?>" alt="Avatar" onerror="this.onerror=null; this.src='../img/logo.jpg';" style="width:38px; height:38px; border-radius:50%; object-fit:cover; border:1px solid var(--admin-card-border); flex-shrink:0;">
-                      <div>
-                        <div style="font-weight:600; color:#ffffff;">
-                          <?= htmlspecialchars($u['email']) ?>
-                          <?php if ($isSelf): ?>
-                            <span style="font-size:0.7rem; color:#60a5fa; background:rgba(59,130,246,0.15); padding:2px 6px; border-radius:4px; margin-left:4px;">Akun Anda</span>
-                          <?php endif; ?>
-                        </div>
+                  <td class="text-left" style="padding-left: 20px;">
+                    <div class="user-cell">
+                      <img src="<?= htmlspecialchars($avatar) ?>" alt="Avatar" onerror="this.onerror=null; this.src='../img/logo.jpg';" class="user-cell-avatar">
+                      <div class="user-cell-info">
+                        <span class="user-cell-email"><?= htmlspecialchars($u['email']) ?></span>
+                        <?php if ($isSelf): ?>
+                          <span class="user-cell-badge">Akun Anda</span>
+                        <?php endif; ?>
                       </div>
                     </div>
                   </td>
