@@ -1,150 +1,250 @@
-# 🖼️ HS15 Web Gallery
+# 🖼️ HS15 Web Gallery & Archive
 
-> A PHP-based digital archive for the photos and videos of HS15 - Komunitas Keliling Banjar.
+> Website arsip digital foto dan video kegiatan komunitas **HS15 - Komunitas Keliling Banjar**. 🚀
 
-![Status](https://img.shields.io/badge/status-active-2f855a?style=flat-square)
-![PHP](https://img.shields.io/badge/PHP-8%2B-777bb4?style=flat-square&logo=php&logoColor=white)
-![Database](https://img.shields.io/badge/MySQL-compatible-4479a1?style=flat-square&logo=mysql&logoColor=white)
+![Status](https://img.shields.io/badge/status-active-2f855a?style=for-the-badge)
+![PHP](https://img.shields.io/badge/PHP-8.0%2B-777bb4?style=for-the-badge&logo=php&logoColor=white)
+![Database](https://img.shields.io/badge/MySQL-MariaDB-4479a1?style=for-the-badge&logo=mysql&logoColor=white)
+![Frontend](https://img.shields.io/badge/Vanilla-JS%20%7C%20CSS3-f7df1e?style=for-the-badge)
 
-## 📖 Overview
+---
 
-HS15 Web Gallery is a lightweight photo and video archive built with plain PHP, HTML, CSS, and JavaScript. It was originally created as an illustration gallery and has since been redesigned as a private documentation space for the HS15 community.
+## 📌 Tentang Proyek
 
-The current project is organized into separate frontend, backend, media, and static-page directories. The interface focuses on simple navigation, responsive layouts, account management, and convenient media viewing.
+**HS15 Web Gallery** awalnya berawal dari galeri sederhana yang kemudian dirombak total menjadi platform arsip privat komunitas. Dibuat murni menggunakan **PHP Native** dan **MySQL** tanpa framework berat, web ini punya performa gesit, hemat resource, dan mudah dimodifikasi sesuai kebutuhan.
 
-## ✨ Features
+Tampilannya mengusung konsep **Dark Glassmorphism** modern bernuansa merah-hitam, navigasi yang intuitif, serta tata letak yang sudah dioptimalkan agar tetap rapi saat diakses dari layar smartphone.
 
-- 🔐 User registration, login, logout, and password reset.
-- 🏠 A post-login home page with direct access to the photo and video galleries.
-- 📸 Photo gallery with automatic PHP GD thumbnails, filename-based captions, pagination, and a fullscreen lightbox.
-- 🎬 Video gallery with native HTML5 controls, optional FFmpeg poster thumbnails, portrait-video support, and pagination.
-- 👤 Account settings for changing the profile photo, email address, and password.
-- 🗑️ Permanent account deletion with password and confirmation checks.
-- 🛡️ Password hashing with `password_hash()` and prepared statements for database queries.
-- 📱 Responsive styles for authentication, navigation, galleries, and account pages.
+---
 
-## 🧰 Tech Stack
+## ✨ Fitur-Fitur Utama
 
-| Area | Technology |
-| --- | --- |
-| Backend | PHP 8 or newer |
-| Database | MySQL or MariaDB |
-| Frontend | HTML, CSS, and vanilla JavaScript |
-| Image processing | PHP GD |
-| Icons | Ionicons via CDN |
-| Local server | Laragon, XAMPP, WAMP, or Apache/Nginx |
-| Video thumbnails | FFmpeg (optional) |
+### 📸 1. Galeri Foto
+- **Auto Thumbnail WebP**: Gambar otomatis dikompres dan dibuatkan thumbnail format WebP lewat PHP GD, jadi loading halaman tetap ngebut tanpa nguras kuota.
+- **Lightbox Interaktif**: Klik foto untuk melihat ukuran penuh, lengkap dengan info tanggal, jam, judul, tombol download, serta navigasi keyboard (panah kiri/kanan & ESC).
+- **Paginasi Rapi**: Pembagian halaman yang konsisten dengan tombol navigasi lengkap (awal, sebelumnya, nomor halaman, berikutnya, akhir).
 
-## 📁 Project Structure
+### 🎬 2. Galeri Video
+- **Smooth Streaming**: Pemutaran video lancar dengan dukungan *HTTP Range Requests*, bikin video bisa di-*seek* maju-mundur tanpa macet.
+- **Support Video Portrait & Landscape**: Video format vertikal (9:16 ala TikTok/Reels) tetap tampil proporsional tanpa terpotong berkat area pemutar adaptif.
+- **Poster Thumbnail Otomatis**: Bisa otomatis mengambil cuplikan frame video jadi gambar sampul jika FFmpeg terpasang.
+
+### 👑 3. Panel Admin (Khusus Admin)
+- **Manajemen Media Lengkap**: Upload foto/video banyak sekaligus (batch upload), edit judul, tanggal kegiatan, jam, serta deskripsi momen.
+- **Filter & Pencarian Cepat**: Cari media berdasarkan judul, filter tipe (foto/video), dan urutkan (terbaru, terlama, atau abjad A-Z).
+- **Hapus Media & Bersih Otomatis**: Hapus satu per satu atau borongan. File asli beserta thumbnail di folder server otomatis ikut terhapus bersih.
+- **Kelola Pengguna & Hak Akses**: Lihat daftar member yang terdaftar, ubah role akun (Admin ↔ Member), dan hapus akun pengguna yang tidak aktif.
+- **Tabel Rapi & Presisi**: Tampilan daftar pengguna dengan avatar dan email yang sejajar lurus ke bawah.
+
+### 🛡️ 4. Keamanan & Proteksi Data
+- **Anti Brute-force Login**: Dibatasi maksimal 5x percobaan gagal per 15 menit per IP/email untuk mencegah pembobolan akun.
+- **CSRF Token Guard**: Semua form penting (login, register, ganti data, upload, hapus) dilindungi token CSRF sekali pakai.
+- **Proteksi Media Langsung**: Folder media diproteksi `.htaccess` dan dialirkan lewat `media.php`. Orang luar tidak bisa asal copas link file tanpa login.
+- **Password Aman**: Hashing password menggunakan algoritma standar industri `password_hash()` (Bcrypt).
+- **Prepared Statements**: Mencegah celah SQL Injection di seluruh query database.
+
+### 👤 5. Profil & Akun Pengguna
+- Halaman pengaturan akun untuk ganti foto profil, ubah email, dan ganti password.
+- Fitur hapus akun mandiri dengan verifikasi password demi keamanan.
+- Sistem menu titik tiga (⋮) yang ringkas di mobile agar tampilan header tidak sesak.
+
+---
+
+## 🧰 Teknologi yang Dipakai
+
+| Bagian | Teknologi | Keterangan |
+| :--- | :--- | :--- |
+| **Backend** | PHP 8.0+ | Native PHP, OOP & Procedural |
+| **Database** | MySQL / MariaDB | Relasional database dengan indexing optimal |
+| **Frontend** | HTML5, CSS3, Vanilla JS | Desain glassmorphism, responsive, tanpa dependency luar |
+| **Icons** | Ionicons (CDN) | Ikon modern dan tajam di segala resolusi |
+| **Pengolahan Gambar**| PHP GD Extension | Resize gambar & convert WebP otomatis |
+| **Thumbnail Video** | FFmpeg *(opsional)* | Mengambil frame poster otomatis dari file video |
+| **Environment** | Laragon / XAMPP | Web server Apache/Nginx di Windows/Linux |
+
+---
+
+## 📁 Struktur Direktori
 
 ```text
 project_hs15/
-├── index.php              # Root entry point; redirects to php/index.php
-├── css/                   # Page-specific and shared stylesheets
-├── js/                    # Gallery, authentication, and navigation scripts
-├── html/
-│   ├── choose.html        # Post-login home page
-│   └── index.html         # Static login redirect page
-├── php/
-│   ├── index.php          # Login page
-│   ├── register.php       # Registration page and handler
-│   ├── fgpass.php         # Password reset page and handler
-│   ├── login.php          # Login handler
-│   ├── logout.php         # Logout handler
-│   ├── account.php        # Account settings and deletion
-│   ├── gallery.php        # Photo gallery and image thumbnails
-│   ├── vidgallery.php     # Video gallery and poster thumbnails
-│   ├── profile_image.php  # Profile image endpoint
-│   └── connect.php        # Database connection configuration
-├── gallery/               # Uploaded photos and videos
-│   └── thumbs/            # Generated image and video thumbnails
-└── img/
-	└── profiles/          # Uploaded profile photos
+├── index.php                 # Pintu masuk utama (redirect otomatis ke login/beranda)
+├── README.md                 # Dokumentasi proyek yang sedang kamu baca ini
+├── css/                      # Kumpulan stylesheet tampilan
+│   ├── background.css        # Efek latar belakang & partikel
+│   ├── global.css            # Variabel warna, font, navbar, & komponen umum
+│   ├── index.css             # Desain halaman login, register, & lupa password
+│   ├── choose.css            # Desain halaman beranda / pilih galeri
+│   ├── gallery.css           # Desain grid galeri foto & lightbox
+│   ├── vidgallery.css        # Desain galeri video & pemutar player
+│   ├── admin.css             # Desain dashboard panel kontrol admin
+│   └── account.css           # Desain halaman setting akun profil
+├── js/                       # Kumpulan script interaktivitas
+│   ├── nav.js                # Logika menu responsif & dropdown titik 3
+│   ├── gallery.js            # Lightbox foto, shortcut keyboard, swipe
+│   └── vidgallery.js         # Kontrol kustom player video
+├── php/                      # Logika backend & halaman aplikasi
+│   ├── index.php             # Form login akun
+│   ├── register.php          # Form pendaftaran akun baru
+│   ├── fgpass.php            # Halaman permintaan reset password
+│   ├── reset_password.php    # Form input password baru via token
+│   ├── login.php             # Handler proses autentikasi login
+│   ├── logout.php            # Handler keluar sesi / destroy session
+│   ├── choose.php            # Halaman beranda utama setelah login
+│   ├── gallery.php           # Halaman galeri foto
+│   ├── vidgallery.php        # Halaman galeri video
+│   ├── admin.php             # Dashboard panel admin & manajemen media
+│   ├── account.php           # Pengaturan profil, ganti foto, & hapus akun
+│   ├── media.php             # Gateway streaming aman untuk file media
+│   ├── profile_image.php     # Endpoint serving foto profil pengguna
+│   ├── connect.php           # Konfigurasi koneksi database MySQL
+│   ├── security_helper.php   # Fungsi keamanan (CSRF, brute-force, RBAC, migrasi)
+│   └── stats_helper.php      # Helper kalkulasi jumlah foto & video
+├── gallery/                  # Folder penyimpanan foto & video yang diupload
+│   ├── .htaccess             # Blokir akses langsung dari luar (forward ke media.php)
+│   └── thumbs/               # Cache thumbnail gambar (.webp) & video (.jpg)
+└── img/                      # Aset gambar statis website
+    ├── logo.jpg              # Logo resmi HS15
+    └── profiles/             # Folder foto profil pengguna
 ```
 
-## ✅ Requirements
+---
 
-- A local PHP web server such as Laragon, XAMPP, or WAMP.
-- MySQL or MariaDB.
-- PHP 8+ with the `mysqli` and `gd` extensions enabled.
-- A modern browser with HTML5 video support.
-- FFmpeg only if automatic video poster thumbnails are required.
+## 🚀 Panduan Instalasi & Menjalankan Web
 
-## 🚀 Installation
+Kamu bisa menjalankan web ini di komputer lokal (Localhost) maupun langsung dideploy ke server hosting (cPanel/VPS). Pilih panduan yang sesuai di bawah ini:
 
-1. Place the project inside your web server document root, such as Laragon's `www` directory.
-2. Start the web server and MySQL/MariaDB.
-3. Create an empty database using phpMyAdmin, HeidiSQL, Adminer, or another database tool.
-4. Select the database and create the base `users` table:
+---
 
-```sql
-CREATE TABLE users (
-	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-	email VARCHAR(255) NOT NULL UNIQUE,
-	password VARCHAR(255) NOT NULL
-);
-```
+### 💻 A. Menjalankan di Komputer Lokal (Laragon / XAMPP)
 
-5. Update the connection values in `php/connect.php`:
+1. **Letakkan Folder Proyek**
+   Pindahkan atau clone repositori ini ke folder root web server kamu:
+   - **Laragon**: `C:\laragon\www\project_hs15\`
+   - **XAMPP**: `C:\xampp\htdocs\project_hs15\`
 
-```php
-$host = "localhost";
-$user = "root";
-$pass = "";
-$db   = "hs15_gallery";
-```
+2. **Nyalakan Web Server & Database**
+   Buka aplikasi Laragon atau XAMPP Control Panel, lalu klik **Start All** (Apache & MySQL).
 
-The default values match a typical Laragon installation. `php/account.php` can add the `profile_photo`, `role`, and `created_at` columns when they are missing, but the base `users` table must exist first.
+3. **Buat Database Baru**
+   - Buka **phpMyAdmin** di browser (`http://localhost/phpmyadmin`) atau aplikasi database favoritmu (HeidiSQL / DBeaver).
+   - Buat database baru dengan nama bebas (contoh: `db_hs15_gallery` atau `nama_db_kamu`).
+   - 🎉 **Tabel Otomatis Dibuat**: Kamu tidak perlu pusing import file `.sql` secara manual! Skrip di `security_helper.php` akan otomatis membuat tabel `users`, `media`, `login_attempts`, dan `password_resets` begitu web pertama kali diakses.
 
-6. Open the project in a browser, for example:
+   > 💡 Jika ingin membuat tabel `users` secara manual terlebih dahulu, berikut skemanya:
+   > ```sql
+   > CREATE TABLE users (
+   >     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+   >     email VARCHAR(255) NOT NULL UNIQUE,
+   >     password VARCHAR(255) NOT NULL,
+   >     role ENUM('admin', 'member') DEFAULT 'member',
+   >     profile_photo VARCHAR(255) NULL,
+   >     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+   > );
+   > ```
 
-```text
-http://localhost/project_hs15/
-```
+4. **Sesuaikan Konfigurasi Database**
+   Buka file `php/connect.php` dengan teks editor, lalu sesuaikan koneksi database kamu:
+   ```php
+   $host = "localhost";
+   $user = "root";               // default Laragon/XAMPP
+   $pass = "";                   // default kosong
+   $db   = "db_hs15_gallery";    // masukkan nama database yang tadi kamu buat
+   ```
 
-Laragon users may also use a configured virtual host such as `http://project_hs15.test/`.
+5. **Buka di Browser**
+   Tinggal akses via browser:
+   ```text
+   http://localhost/project_hs15/
+   ```
+   *(Atau kalau pakai Laragon Virtual Host: `http://project_hs15.test/`)*
 
-## 🗂️ Adding Media
+---
 
-### 📸 Photos
+### 🌐 B. Menjalankan di Server Hosting (cPanel / Shared Hosting)
 
-Put `JPG`, `JPEG`, `PNG`, `GIF`, or `WEBP` files in `gallery/`. Image thumbnails are generated in `gallery/thumbs/` when the photo gallery is opened. The gallery displays up to 16 photos per page.
+Mau pasang galeri ini biar bisa diakses online bareng teman-teman komunitas? Caranya gampang banget:
 
-### 🎬 Videos
+1. **Siapkan File Web (.zip)**
+   - Masukkan seluruh file dan folder proyek ke dalam file arsip `.zip`.
+   - ⚠️ **Penting**: Pastikan file tersembunyi seperti `gallery/.htaccess` ikut ter-zip, karena file ini wajib ada untuk memproteksi media dari akses luar.
 
-Put `MP4`, `WEBM`, `OGG`, or `M4V` files in `gallery/`. To generate poster thumbnails, place `ffmpeg.exe` in `php/`. Videos remain playable without FFmpeg, but no automatic poster image will be generated. The video gallery displays up to 12 videos per page.
+2. **Upload ke File Manager Hosting**
+   - Login ke **cPanel** hosting kamu.
+   - Buka menu **File Manager**, lalu masuk ke folder `public_html` (atau folder subdomain kamu, misal: `galeri.domainkamu.com`).
+   - Klik tombol **Upload**, pilih file `.zip` tadi, lalu setelah selesai klik kanan file dan pilih **Extract**.
 
-Portrait videos keep their original aspect ratio and use a black playback area so that the content is not cropped.
+3. **Buat Database & User di cPanel**
+   - Di dashboard cPanel, masuk ke menu **MySQL Database Wizard**.
+   - **Langkah 1**: Beri nama database baru (misal: `usernamehosting_dbhs15`).
+   - **Langkah 2**: Buat user database baru dan password yang kuat. Catat username dan password ini baik-baik.
+   - **Langkah 3**: Berikan centang pada opsi **ALL PRIVILEGES** (Semua Hak Akses), lalu klik *Next Step*.
 
-### 🏷️ Video Titles, Dates, and Times
+4. **Hubungkan Database di `php/connect.php`**
+   - Di File Manager cPanel, cari dan edit file `php/connect.php`.
+   - Masukkan detail database yang baru saja kamu buat:
+     ```php
+     $host = "localhost";                     // biasanya tetap localhost di sebagian besar cPanel
+     $user = "usernamehosting_userhs15";      // user database cPanel kamu
+     $pass = "PasswordKuatDatabaseKamu123!";  // password user database
+     $db   = "usernamehosting_dbhs15";        // nama database cPanel kamu
+     ```
+   - Klik **Save Changes**.
 
-The gallery builds each caption from the media filename. Use a timestamp-based filename to show a readable video title, date, and time:
+5. **Pastikan Versi PHP & Ekstensi Aktif**
+   - Di cPanel, cari menu **Select PHP Version** atau **MultiPHP Manager**.
+   - Pilih versi **PHP 8.0, 8.1, atau 8.2**.
+   - Di tab *Extensions*, pastikan ekstensi berikut dicentang/aktif:
+     - `mysqli` (koneksi database)
+     - `gd` (kompresi & generate thumbnail foto WebP)
+     - `fileinfo` (validasi tipe file media)
+     - `mbstring` (keperluan string UTF-8)
 
-- `HS15_Gathering.mp4` -> `21 September 2025 - 16:00`
-- `HS15_Traveling.mp4` -> `5 October 2025 - 08:30`
-- `HS15_3rd_Anniv.jpg` -> `15 November 2025 - 19:15`
-- `HS15_Funny_Moment.mp4` -> `20 December 2025`
+6. **Atur Izin Folder (Permissions)**
+   - Pastikan folder tempat menyimpan upload foto & video memiliki izin tulis (*writeable*).
+   - Di File Manager, cek permission folder berikut (biasanya bernilai `0755`):
+     - `gallery/`
+     - `gallery/thumbs/`
+     - `img/profiles/`
 
-Other filenames, such as `HS15_Gathering.mp4`, are displayed as regular title-cased captions. The current parser does not combine a custom video title with a timestamp; the date and time shown in the gallery come from the filename, not from the file metadata.
+7. **Naikkan Batas Upload Media (Biar Bisa Upload Video Besar)**
+   - Masuk ke menu **MultiPHP INI Editor** di cPanel.
+   - Pilih domain/lokasi website kamu, lalu sesuaikan nilai berikut:
+     ```ini
+     upload_max_filesize = 256M   ; atau 512M sesuai kebutuhan ukuran video
+     post_max_size = 256M
+     memory_limit = 256M
+     max_execution_time = 300
+     ```
+   - Klik **Apply**.
 
-## 🧭 User Flow
+8. **Selesai & Coba Akses Website!**
+   - Buka domain kamu di browser, misalnya `https://galeri.domainkamu.com` atau `https://domainkamu.com`.
+   - Begitu halaman pertama terbuka, sistem akan otomatis menginisialisasi tabel-tabel database yang diperlukan.
+   - Daftarkan akun pertama kamu lewat menu Register, dan web siap dipakai! 🚀
 
-```text
-Register -> Login -> Home
-					|-> Photo Gallery
-					|-> Video Gallery
-					`-> Account Settings
-```
+---
 
-Gallery pagination keeps the first, previous, next, and last controls visible for a consistent layout. Unavailable controls are shown in a disabled state, and the layout becomes more compact on mobile screens.
+## 🔑 Hak Akses & Akun Admin
 
-## 📝 Development Notes
+- Setiap akun baru yang mendaftar via menu register secara default berstatus sebagai **Member**.
+- Akun pertama yang terdaftar atau akun dengan email admin utama (misalnya `adm_******@gmail.com`) akan otomatis diangkat sebagai **Admin** oleh sistem.
+- Admin punya hak akses ke **Panel Admin** untuk upload foto/video baru, edit keterangan dokumentasi, kelola data pengguna, serta menaikkan/menurunkan peran akun lain.
 
-- 🔒 Do not commit database passwords or other production secrets.
-- ✍️ Keep `gallery/` and `img/profiles/` writable so generated thumbnails and profile photos can be stored.
-- 🔑 Use a strong database password for public deployments.
-- 🌐 Review and disable development-only configuration before deploying the application publicly.
+---
 
-## 📄 License
+## 💡 Tips & Catatan Tambahan
 
-This project was created for HS15 community documentation. Usage and distribution terms can be added according to the project owner's agreement.
+1. **Izin Folder Server**:
+   Pastikan folder `gallery/`, `gallery/thumbs/`, dan `img/profiles/` tetap writeable agar proses upload foto, video, dan pembuatan thumbnail berjalan lancar tanpa error `Permission Denied`.
+2. **Thumbnail Video dengan FFmpeg (Opsional)**:
+   - **Di Lokal**: Kamu bisa meletakkan `ffmpeg.exe` di dalam folder `php/`.
+   - **Di Hosting**: Biasanya shared hosting tidak mengizinkan binary kustom. Namun jangan khawatir, video tetap berjalan normal dan sistem akan menggunakan thumbnail poster default yang rapi.
+3. **Keamanan Tambahan di Hosting**:
+   Disarankan selalu mengaktifkan sertifikat **SSL (HTTPS)** gratis (seperti Let's Encrypt di cPanel) agar transmisi data login dan streaming media terenkripsi dengan aman.
+   
+---
+
+## 📜 Lisensi & Catatan Komunitas
+
+Aplikasi ini dikembangkan untuk arsip dan dokumentasi internal keluarga besar komunitas **HS15 (Keliling Banjar)**. Seluruh kenangan dan media yang ada di dalamnya dijaga bersama untuk kebersamaan kita! 🎉
