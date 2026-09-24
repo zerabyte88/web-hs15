@@ -1,6 +1,6 @@
 # 🖼️ HS15 Web Gallery & Archive
 
-> Website arsip digital foto dan video kegiatan komunitas **HS15 - Komunitas Keliling Banjar**. 🚀
+> Website arsip digital foto dan video kegiatan komunitas **HS15 - Komunitas Keliling Banjar**.
 
 ![Status](https://img.shields.io/badge/status-active-2f855a?style=for-the-badge)
 ![PHP](https://img.shields.io/badge/PHP-8.0%2B-777bb4?style=for-the-badge&logo=php&logoColor=white)
@@ -249,5 +249,5 @@ Mau pasang galeri ini biar bisa diakses online bareng teman-teman komunitas? Car
 
 ## 📜 Lisensi & Catatan Komunitas
 
-Aplikasi ini dikembangkan untuk arsip dan dokumentasi internal keluarga besar komunitas **HS15 (Keliling Banjar)**. Seluruh kenangan dan media yang ada di dalamnya dijaga bersama untuk kebersamaan kita! 🎉
+Aplikasi ini dikembangkan untuk arsip dan dokumentasi internal keluarga besar komunitas **HS15 (Keliling Banjar)**. Seluruh kenangan dan media yang ada di dalamnya dijaga bersama untuk kebersamaan.
 
