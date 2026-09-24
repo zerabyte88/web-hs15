@@ -1,9 +1,9 @@
 <?php
-session_start();
+require_once __DIR__ . '/security_helper.php';
 
-// Jika sudah login, bisa langsung redirect ke choose.html
+// Jika sudah login, bisa langsung redirect ke choose.php
 if (isset($_SESSION['user_id'])) {
-    header("Location: ../html/choose.html");
+    header("Location: choose.php");
     exit;
 }
 
@@ -12,11 +12,17 @@ $success_message = '';
 
 if (isset($_GET['error'])) {
     switch ($_GET['error']) {
+        case 'invalid_credentials':
         case 'invalid_password':
-            $error_message = 'Password yang Anda masukkan salah.';
-            break;
         case 'user_not_found':
-            $error_message = 'Email tidak terdaftar dalam sistem.';
+            $error_message = 'Email atau password yang Anda masukkan salah.';
+            break;
+        case 'too_many_attempts':
+            $wait = isset($_GET['wait']) ? max(1, (int)$_GET['wait']) : 15;
+            $error_message = 'Terlalu banyak percobaan login gagal. Silakan coba lagi dalam ' . $wait . ' menit.';
+            break;
+        case 'csrf_error':
+            $error_message = 'Sesi keamanan telah berakhir. Silakan coba lagi.';
             break;
         case 'empty_fields':
             $error_message = 'Silakan isi email dan password Anda.';
@@ -35,7 +41,7 @@ if (isset($_GET['reset']) && $_GET['reset'] == 1) {
 }
 
 if (isset($_GET['deleted']) && $_GET['deleted'] == 1) {
-  $success_message = 'Akun berhasil dihapus secara permanen.';
+    $success_message = 'Akun berhasil dihapus secara permanen.';
 }
 ?>
 <!DOCTYPE html>
@@ -79,6 +85,7 @@ if (isset($_GET['deleted']) && $_GET['deleted'] == 1) {
       <?php endif; ?>
 
       <form action="../php/login.php" method="post" autocomplete="off">
+        <?= csrf_field() ?>
         <div class="input-group">
           <label for="email">Email</label>
           <div class="input-wrapper">

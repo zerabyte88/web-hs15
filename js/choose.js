@@ -93,27 +93,33 @@ function loadGalleryStats() {
 
   if (!photoElem && !videoElem) return;
 
-  fetch('../php/stats_helper.php')
+  fetch('../php/stats_helper.php?t=' + Date.now())
     .then((res) => {
-      if (!res.ok) throw new Error('Gagal mengambil statistik');
+      if (!res.ok) throw new Error('Gagal mengambil statistik: status ' + res.status);
       return res.json();
     })
     .then((data) => {
       if (photoElem && typeof data.photos === 'number') {
-        animateValue(photoElem, 0, data.photos, 700);
+        const startVal = parseInt(photoElem.textContent, 10) || 0;
+        animateValue(photoElem, startVal, data.photos, 700);
       }
       if (videoElem && typeof data.videos === 'number') {
-        animateValue(videoElem, 0, data.videos, 700);
+        const startVal = parseInt(videoElem.textContent, 10) || 0;
+        animateValue(videoElem, startVal, data.videos, 700);
       }
     })
     .catch((err) => {
-      console.warn('Statistik galeri tidak dapat dimuat:', err);
-      if (photoElem) photoElem.textContent = '0';
-      if (videoElem) videoElem.textContent = '0';
+      console.warn('Statistik galeri tidak dapat dimuat secara dinamis:', err);
     });
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+function initChoosePage() {
   preloadImages();
   loadGalleryStats();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initChoosePage);
+} else {
+  initChoosePage();
+}

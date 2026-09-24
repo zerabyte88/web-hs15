@@ -2,109 +2,13 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HS15 - Jelajahi Galeri</title>
-  <link rel="stylesheet" href="../css/background.css?v=20260918">
-  <link rel="stylesheet" href="../css/global.css?v=20260918">
-  <link rel="stylesheet" href="../css/choose.css?v=20260918">
-  <link rel="icon" href="../img/logo.jpg" type="image/jpeg">
-  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <meta http-equiv="refresh" content="0;url=../php/choose.php">
+  <title>Pengalihan - HS15</title>
+  <script>
+    window.location.replace('../php/choose.php');
+  </script>
 </head>
-<body class="choose-page">
-
-  <!-- Header Navigasi -->
-  <header>
-    <nav>
-      <a href="choose.html" class="logo" id="logo-link">
-        <img src="../img/logo.jpg" alt="HS15 Logo" class="logo-img">
-        <span>HS15 - Komunitas Keliling Banjar</span>
-      </a>
-      <ul id="menu" class="nav-main">
-        <li><a href="choose.html" class="nav-active">Beranda</a></li>
-        <li><a href="../php/gallery.php">Foto</a></li>
-        <li><a href="../php/vidgallery.php">Video</a></li>
-      </ul>
-      <div class="profile-menu">
-        <button type="button" class="profile-button" aria-expanded="false" aria-controls="profile-dropdown" title="Menu akun">
-          <img src="../img/logo.jpg" alt="Foto profil" class="profile-avatar">
-        </button>
-        <div id="profile-dropdown" class="profile-dropdown">
-          <a href="../php/account.php">Setelan Akun</a>
-          <a href="../php/logout.php" class="dropdown-logout">Log Out</a>
-        </div>
-      </div>
-    </nav>
-  </header>
-
-  <!-- Latar Belakang Slideshow & Overlay (Tetap dipertahankan) -->
-  <div id="bkgd1"></div>
-  <div id="bkgd2"></div>
-  <div class="bkgd-overlay"></div>
-
-  <!-- Konten Utama Landing Page -->
-  <main class="choose-main">
-    <div class="hero-section">
-      <h1>Jelajahi Dokumentasi HS15</h1>
-      <p>Arsip koleksi momen kebersamaan, perjalanan keliling Banjar dalam foto & video</p>
-    </div>
-
-    <!-- Statistik Galeri HS15 -->
-    <section class="stats-container" aria-label="Statistik Galeri HS15">
-      <div class="stat-card">
-        <div class="stat-icon">
-          <ion-icon name="images-outline"></ion-icon>
-        </div>
-        <div class="stat-info">
-          <span class="stat-number" id="statPhotos">-</span>
-          <span class="stat-label">Total Foto</span>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon">
-          <ion-icon name="videocam-outline"></ion-icon>
-        </div>
-        <div class="stat-info">
-          <span class="stat-number" id="statVideos">-</span>
-          <span class="stat-label">Total Video</span>
-        </div>
-      </div>
-    </section>
-
-    <div class="menu">
-      <a href="../php/gallery.php" class="card">
-        <div class="content">
-          <div class="icon">
-            <ion-icon name="images-outline"></ion-icon>
-          </div>
-          <h2>Galeri Foto</h2>
-          <p>Lihat koleksi foto momen dokumentasi perjalanan kami</p>
-          <span class="card-action">Buka Galeri <ion-icon name="arrow-forward-outline"></ion-icon></span>
-        </div>
-      </a>
-
-      <a href="../php/vidgallery.php" class="card">
-        <div class="content">
-          <div class="icon">
-            <ion-icon name="videocam-outline"></ion-icon>
-          </div>
-          <h2>Galeri Video</h2>
-          <p>Tonton rekaman dokumentasi video seru kami</p>
-          <span class="card-action">Buka Galeri <ion-icon name="arrow-forward-outline"></ion-icon></span>
-        </div>
-      </a>
-    </div>
-  </main>
-
-  <!-- Footer Copyright -->
-  <footer class="main-footer">
-    <p>&copy; 2026 HS15 - Komunitas Keliling Banjar. All rights reserved.</p>
-  </footer>
-
-  <!-- Skrip Slideshow -->
-  <script src="../js/choose.js"></script>
-  <script src="../js/nav.js?v=20260918"></script>
-
+<body style="background: #0b0d12; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
+  <p>Mengarahkan ke beranda HS15... <a href="../php/choose.php" style="color: #e50914;">Klik di sini jika tidak otomatis beralih.</a></p>
 </body>
 </html>

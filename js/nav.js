@@ -1,8 +1,9 @@
-﻿document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
   const profileMenus = document.querySelectorAll('.profile-menu');
   const profileAvatars = document.querySelectorAll('.profile-avatar');
 
-  fetch('../php/profile_image.php', { credentials: 'same-origin' })
+  const profileEndpoint = window.location.pathname.includes('/php/') ? 'profile_image.php' : 'php/profile_image.php';
+  fetch(profileEndpoint, { credentials: 'same-origin' })
     .then(function (response) { return response.json(); })
     .then(function (data) {
       if (!data.image) return;
@@ -38,6 +39,38 @@
 
     document.addEventListener('keydown', function (event) {
       if (event.key === 'Escape') closeMenu();
+    });
+  });
+
+  // Mobile 3-dots menu handling
+  const mobileMenuBtns = document.querySelectorAll('.mobile-menu-btn');
+  mobileMenuBtns.forEach(function (btn) {
+    const wrap = btn.closest('.mobile-menu-wrap');
+    if (!wrap) return;
+    const dropdown = wrap.querySelector('.mobile-dropdown');
+    if (!dropdown) return;
+
+    function closeMobileMenu() {
+      dropdown.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+
+    btn.addEventListener('click', function (event) {
+      event.stopPropagation();
+      const isOpen = dropdown.classList.contains('is-open');
+      document.querySelectorAll('.mobile-dropdown.is-open').forEach(function (d) {
+        if (d !== dropdown) d.classList.remove('is-open');
+      });
+      dropdown.classList.toggle('is-open', !isOpen);
+      btn.setAttribute('aria-expanded', String(!isOpen));
+    });
+
+    document.addEventListener('click', function (event) {
+      if (!wrap.contains(event.target)) closeMobileMenu();
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') closeMobileMenu();
     });
   });
 });

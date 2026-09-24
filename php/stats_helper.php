@@ -47,8 +47,11 @@ function getGalleryStats($galleryDir = null) {
 
 // Jika diakses langsung via HTTP request (misalnya fetch dari JavaScript), return JSON
 if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === 'stats_helper.php') {
+    header('Access-Control-Allow-Origin: *');
     header('Content-Type: application/json; charset=utf-8');
-    header('Cache-Control: public, max-age=60');
+    header('Cache-Control: no-cache, no-store, must-revalidate');
+    header('Pragma: no-cache');
+    header('Expires: 0');
     echo json_encode(getGalleryStats());
     exit;
 }

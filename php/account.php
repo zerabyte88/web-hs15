@@ -1,6 +1,6 @@
-﻿<?php
-session_start();
-require __DIR__ . '/connect.php';
+<?php
+require_once __DIR__ . '/connect.php';
+require_once __DIR__ . '/security_helper.php';
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: index.php');
@@ -36,7 +36,10 @@ if (!$user) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? '';
+    if (!validate_csrf()) {
+        $errorMessage = 'Sesi keamanan telah berakhir. Silakan muat ulang halaman.';
+    } else {
+        $action = $_POST['action'] ?? '';
 
     if ($action === 'profile') {
         if (!isset($_FILES['profile_photo']) || $_FILES['profile_photo']['error'] !== UPLOAD_ERR_OK) {
@@ -155,6 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           }
     }
 }
+}
 
 $profileImage = !empty($user['profile_photo']) && is_file(dirname(__DIR__) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $user['profile_photo']))
     ? '../' . $user['profile_photo']
@@ -162,6 +166,14 @@ $profileImage = !empty($user['profile_photo']) && is_file(dirname(__DIR__) . DIR
 $role = strtolower($user['role'] ?: 'member');
 $roleLabel = ucfirst($role);
 $createdDate = date('d F Y', strtotime($user['created_at']));
+
+$currentUserEmail = $user['email'] ?? ($_SESSION['email'] ?? 'User');
+$currentUserRole  = $user['role'] ?? ($_SESSION['role'] ?? 'member');
+$isSuperAdmin     = ($currentUserRole === 'admin');
+$roleBadgeText    = $isSuperAdmin ? 'Super Admin' : 'Member';
+
+$globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '/../css/global.css') : time();
+$accountVer = file_exists(__DIR__ . '/../css/account.css') ? filemtime(__DIR__ . '/../css/account.css') : time();
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -169,29 +181,79 @@ $createdDate = date('d F Y', strtotime($user['created_at']));
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Setelan Akun - HS15</title>
-  <link rel="stylesheet" href="../css/global.css?v=20260918">
-  <link rel="stylesheet" href="../css/account.css?v=20260918">
+  <link rel="stylesheet" href="../css/global.css?v=<?= $globalVer ?>">
+  <link rel="stylesheet" href="../css/account.css?v=<?= $accountVer ?>">
   <link rel="icon" href="../img/logo.jpg" type="image/jpeg">
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </head>
 <body>
+  <!-- Header Navigasi -->
   <header>
     <nav>
-      <a href="../html/choose.html" class="logo" id="logo-link">
+      <a href="choose.php" class="logo" id="logo-link">
         <img src="../img/logo.jpg" alt="HS15 Logo" class="logo-img">
-        <span>HS15 - Komunitas Keliling Banjar</span>
+        <span class="logo-title">HS15<span class="logo-sub"> - Komunitas Keliling Banjar</span></span>
       </a>
-      <ul id="menu" class="nav-main">
-        <li><a href="../html/choose.html">Beranda</a></li>
-        <li><a href="../php/gallery.php">Foto</a></li>
-        <li><a href="../php/vidgallery.php">Video</a></li>
-      </ul>
-      <div class="profile-menu">
-        <button type="button" class="profile-button" aria-expanded="false" aria-controls="profile-dropdown" title="Menu akun">
-          <img src="<?= htmlspecialchars($profileImage) ?>" alt="Foto profil" class="profile-avatar">
+
+      <div class="admin-nav-links">
+        <a href="choose.php" class="admin-nav-link" title="Ke Beranda Utama">
+          <ion-icon name="home-outline"></ion-icon> <span>Beranda</span>
+        </a>
+        <a href="gallery.php" class="admin-nav-link" title="Buka Galeri Foto">
+          <ion-icon name="images-outline"></ion-icon> <span>Foto</span>
+        </a>
+        <a href="vidgallery.php" class="admin-nav-link" title="Buka Galeri Video">
+          <ion-icon name="videocam-outline"></ion-icon> <span>Video</span>
+        </a>
+        <a href="account.php" class="admin-nav-link nav-desktop-only active" title="Pengaturan Akun">
+          <ion-icon name="person-circle-outline"></ion-icon> <span>Akun</span>
+        </a>
+        <?php if ($isSuperAdmin): ?>
+          <a href="admin.php" class="admin-nav-link nav-desktop-only" style="color:#ff3b47;" title="Panel Administrasi">
+            <ion-icon name="shield-checkmark-outline"></ion-icon> <span>Admin</span>
+          </a>
+        <?php endif; ?>
+      </div>
+
+      <!-- Desktop User Profile -->
+      <div class="admin-nav-user nav-desktop-only">
+        <img src="<?= htmlspecialchars(get_current_user_avatar($conn)) ?>" alt="Foto profil" class="admin-header-avatar" onerror="this.onerror=null; this.src='../img/logo.jpg';">
+        <div class="user-pill">
+          <span class="user-email"><?= htmlspecialchars($currentUserEmail) ?></span>
+          <span class="user-role-badge" style="<?= !$isSuperAdmin ? 'color: #60a5fa;' : '' ?>"><?= $roleBadgeText ?></span>
+        </div>
+        <a href="logout.php" class="btn-logout" title="Log Out Sesi">
+          <ion-icon name="log-out-outline"></ion-icon>
+        </a>
+      </div>
+
+      <!-- Mobile 3-Dots Menu -->
+      <div class="mobile-menu-wrap">
+        <button type="button" class="mobile-menu-btn active" aria-label="Menu akun dan opsi" aria-expanded="false">
+          <ion-icon name="ellipsis-vertical"></ion-icon>
         </button>
-        <div id="profile-dropdown" class="profile-dropdown">
-          <a href="../php/account.php">Setelan Akun</a>
-          <a href="../php/logout.php" class="dropdown-logout">Log Out</a>
+        <div class="mobile-dropdown">
+          <div class="mobile-dropdown-user">
+            <img src="<?= htmlspecialchars(get_current_user_avatar($conn)) ?>" alt="Foto profil" class="mobile-dropdown-avatar" onerror="this.onerror=null; this.src='../img/logo.jpg';">
+            <div class="mobile-dropdown-info">
+              <span class="mobile-dropdown-email"><?= htmlspecialchars($currentUserEmail) ?></span>
+              <span class="mobile-dropdown-role" style="<?= !$isSuperAdmin ? 'color: #60a5fa;' : '' ?>"><?= $roleBadgeText ?></span>
+            </div>
+          </div>
+          <div class="mobile-dropdown-divider"></div>
+          <a href="account.php" class="mobile-dropdown-item active">
+            <ion-icon name="person-circle-outline"></ion-icon> Setelan Akun
+          </a>
+          <?php if ($isSuperAdmin): ?>
+            <a href="admin.php" class="mobile-dropdown-item" style="color:#ff3b47;">
+              <ion-icon name="shield-checkmark-outline"></ion-icon> Panel Admin
+            </a>
+          <?php endif; ?>
+          <div class="mobile-dropdown-divider"></div>
+          <a href="logout.php" class="mobile-dropdown-item mobile-logout">
+            <ion-icon name="log-out-outline"></ion-icon> Log Out
+          </a>
         </div>
       </div>
     </nav>
@@ -221,7 +283,14 @@ $createdDate = date('d F Y', strtotime($user['created_at']));
         <span class="role-badge"><?= htmlspecialchars($roleLabel) ?></span>
         <p class="member-since">Bergabung sejak <?= htmlspecialchars($createdDate) ?></p>
 
+        <?php if ($user['role'] === 'admin'): ?>
+          <a href="admin.php" class="account-button" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:8px; margin-bottom:14px; background:#e50914; color:#fff;">
+            <ion-icon name="shield-checkmark-outline"></ion-icon> Buka Panel Admin
+          </a>
+        <?php endif; ?>
+
         <form method="post" enctype="multipart/form-data" class="profile-upload">
+          <?= csrf_field() ?>
           <input type="hidden" name="action" value="profile">
           <label for="profile_photo" class="file-label">Pilih foto baru</label>
           <input type="file" id="profile_photo" name="profile_photo" accept="image/jpeg,image/png,image/webp" required>
@@ -236,6 +305,7 @@ $createdDate = date('d F Y', strtotime($user['created_at']));
             </div>
           </div>
           <form method="post" class="profile-upload delete-account-form" onsubmit="return confirm('Akun akan dihapus permanen. Lanjutkan?');">
+            <?= csrf_field() ?>
             <input type="hidden" name="action" value="delete_account">
             <label for="delete_current_password">Password saat ini</label>
             <input type="password" id="delete_current_password" name="current_password" autocomplete="current-password" required>
@@ -252,6 +322,7 @@ $createdDate = date('d F Y', strtotime($user['created_at']));
             <div><h2>Email Akun</h2><p>Perbarui alamat email untuk login.</p></div>
           </div>
           <form method="post" class="account-form">
+            <?= csrf_field() ?>
             <input type="hidden" name="action" value="email">
             <label for="email">Email baru</label>
             <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
@@ -266,6 +337,7 @@ $createdDate = date('d F Y', strtotime($user['created_at']));
             <div><h2>Password</h2><p>Gunakan password yang kuat dan unik.</p></div>
           </div>
           <form method="post" class="account-form">
+            <?= csrf_field() ?>
             <input type="hidden" name="action" value="password">
             <label for="password_current">Password saat ini</label>
             <input type="password" id="password_current" name="current_password" autocomplete="current-password" required>
@@ -284,6 +356,6 @@ $createdDate = date('d F Y', strtotime($user['created_at']));
   <footer class="main-footer">
     <p>&copy; 2026 HS15 - Komunitas Keliling Banjar. All rights reserved.</p>
   </footer>
-  <script src="../js/nav.js?v=20260918"></script>
+  <script src="../js/nav.js?v=20260924_v2"></script>
 </body>
 </html>

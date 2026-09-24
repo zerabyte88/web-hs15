@@ -77,7 +77,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Klik figure atau gambar untuk membuka lightbox
   figures.forEach(function (figure, idx) {
-    figure.addEventListener("click", function () {
+    figure.addEventListener("click", function (e) {
+      if (e.target.closest(".gallery-download-btn, a")) return;
       openLightbox(idx);
     });
   });

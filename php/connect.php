@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // connect.php
 $host = "localhost";
 $user = "root";   // default Laragon

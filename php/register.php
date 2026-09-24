@@ -1,18 +1,21 @@
-﻿<?php
-session_start();
-require __DIR__ . '/connect.php';
+<?php
+require_once __DIR__ . '/connect.php';
+require_once __DIR__ . '/security_helper.php';
 
 $error_message = '';
 $email_val = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? '';
-    $confirm_password = $_POST['confirm_password'] ?? '';
-    $email_val = $email;
+    if (!validate_csrf()) {
+        $error_message = "Sesi keamanan telah berakhir. Silakan muat ulang halaman dan coba lagi.";
+    } else {
+        $email = trim($_POST['email'] ?? '');
+        $password = $_POST['password'] ?? '';
+        $confirm_password = $_POST['confirm_password'] ?? '';
+        $email_val = $email;
 
-    if (empty($email) || empty($password) || empty($confirm_password)) {
-        $error_message = "Semua kolom wajib diisi.";
+        if (empty($email) || empty($password) || empty($confirm_password)) {
+            $error_message = "Semua kolom wajib diisi.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error_message = "Format email tidak valid.";
     } elseif (strlen($password) < 6) {
@@ -42,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
+}
 }
 ?>
 <!DOCTYPE html>
@@ -78,6 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <?php endif; ?>
 
       <form method="post" autocomplete="off">
+        <?= csrf_field() ?>
         <div class="input-group">
           <label for="email">Email</label>
           <div class="input-wrapper">
