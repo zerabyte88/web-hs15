@@ -1,0 +1,5 @@
+# Proteksi folder media - Arahkan seluruh akses media ke media.php
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(.*)$ ../php/media.php?file=$1 [L,QSA]
+</IfModule>

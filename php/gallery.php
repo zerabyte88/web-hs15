@@ -14,11 +14,11 @@ $currentUserRole  = $_SESSION['role'] ?? 'member';
 $isSuperAdmin     = ($currentUserRole === 'admin');
 $roleBadgeText    = $isSuperAdmin ? 'Super Admin' : 'Member';
 
-$dir = __DIR__ . "/../gallery/";
-$thumbDir = $dir . "thumbs/";
-if (!is_dir($thumbDir)) @mkdir($thumbDir, 0755, true);
+sync_media_files_to_db($conn);
+$dir = get_media_base_dir();
+$thumbDir = get_thumbs_base_dir();
 
-$stats = getGalleryStats($dir);
+$stats = getGalleryStats();
 
 // Pagination & Query dari tabel media
 $perPage = 16; // 4 kolom x 4 baris
@@ -174,19 +174,8 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
           $desc = !empty($i['description']) ? $i['description'] : '';
           $lightboxCaption = $formattedCaption . ($desc ? " — $desc" : "");
 
-          $base = pathinfo($img, PATHINFO_FILENAME);
-          $thumbWebp = $thumbDir . $base . '.webp';
-          $thumbOrig = $thumbDir . $img;
-
-          if (file_exists($thumbWebp)) {
-              $displayThumb = '../gallery/thumbs/' . rawurlencode($base . '.webp');
-          } elseif (file_exists($thumbOrig)) {
-              $displayThumb = '../gallery/thumbs/' . rawurlencode($img);
-          } else {
-              generate_photo_thumbnail($dir . $img, $thumbWebp, 480);
-              $displayThumb = file_exists($thumbWebp) ? '../gallery/thumbs/' . rawurlencode($base . '.webp') : '../gallery/' . rawurlencode($img);
-          }
-          $fullSrc = '../gallery/' . rawurlencode($img);
+          $displayThumb = get_media_thumb_url($img, 'photo');
+          $fullSrc = media_url($img);
         ?>
           <figure class="gallery-item" data-index="<?= $index ?>" data-full="<?= $fullSrc ?>" data-caption="<?= htmlspecialchars($lightboxCaption) ?>">
             <div class="gallery-item__media">
@@ -199,7 +188,7 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
             </div>
             <figcaption>
               <span class="gallery-caption" title="<?= htmlspecialchars($formattedCaption) ?>"><?= htmlspecialchars($formattedCaption) ?></span>
-              <a href="<?= $fullSrc ?>" download="<?= htmlspecialchars($img) ?>" class="gallery-download-btn" title="Download Foto Asli" onclick="event.stopPropagation();">
+              <a href="<?= $fullSrc ?>" download="<?= htmlspecialchars(basename($img)) ?>" class="gallery-download-btn" title="Download Foto Asli" onclick="event.stopPropagation();">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                   <polyline points="7 10 12 15 17 10"></polyline>

@@ -7,14 +7,11 @@ require_once __DIR__ . '/stats_helper.php';
 // 1. Otorisasi Keamanan: Wajib Login & Peran Admin
 require_admin($conn);
 
-// 2. Sinkronisasi Otomatis Media Folder gallery/ dengan Database
+// 2. Sinkronisasi Otomatis Media Folder media/ dengan Database (termasuk subfolder)
 sync_media_files_to_db($conn);
 
-$galleryDir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'gallery' . DIRECTORY_SEPARATOR;
-$thumbsDir  = $galleryDir . 'thumbs' . DIRECTORY_SEPARATOR;
-if (!is_dir($thumbsDir)) {
-    @mkdir($thumbsDir, 0755, true);
-}
+$mediaDir  = get_media_base_dir();
+$thumbsDir = get_thumbs_base_dir();
 
 $currentUserId = (int) $_SESSION['user_id'];
 $currentUserEmail = $_SESSION['email'] ?? 'Admin';
@@ -57,27 +54,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
+        // Target folder (opsional: root, subfolder yang dipilih, atau folder baru yang diketik)
+        $targetFolder = trim($_POST['target_folder'] ?? '');
+        $newFolderName = trim($_POST['new_folder_name'] ?? '');
+
+        if ($targetFolder === '__new__' && !empty($newFolderName)) {
+            $targetFolder = $newFolderName;
+        } elseif (!empty($newFolderName) && empty($targetFolder)) {
+            $targetFolder = $newFolderName;
+        }
+
+        $targetFolder = preg_replace('/[\\/\\\\:*?"<>|]/', '', $targetFolder);
+        $targetFolder = trim(str_replace('..', '', $targetFolder));
+        
+        $uploadFolder = $mediaDir . (!empty($targetFolder) ? $targetFolder . DIRECTORY_SEPARATOR : '');
+        if (!is_dir($uploadFolder)) {
+            @mkdir($uploadFolder, 0755, true);
+        }
+
         // Generate nama file yang unik & rapi
         $prefix = ($mediaType === 'photo') ? 'IMG_' : 'VID_';
         $timestamp = date('Ymd_His');
         $uniqueSuffix = bin2hex(random_bytes(3));
         $newFilename = "{$prefix}{$timestamp}_{$uniqueSuffix}.{$ext}";
-        $destPath = $galleryDir . $newFilename;
+        $destPath = $uploadFolder . $newFilename;
+        $dbFilename = (!empty($targetFolder) ? $targetFolder . '/' : '') . $newFilename;
 
         if (!move_uploaded_file($file['tmp_name'], $destPath)) {
             header("Location: admin.php?tab=upload&error=upload_failed");
             exit;
         }
 
-        // Generate thumbnail/poster
-        $nameWithoutExt = pathinfo($newFilename, PATHINFO_FILENAME);
-        if ($mediaType === 'photo') {
-            $thumbDest = $thumbsDir . $nameWithoutExt . '.webp';
-            generate_photo_thumbnail($destPath, $thumbDest, 480);
-        } else {
-            $posterDest = $thumbsDir . $nameWithoutExt . '.jpg';
-            generate_video_poster($destPath, $posterDest);
-        }
+        // Generate thumbnail/poster otomatis
+        get_media_thumb_url($dbFilename, $mediaType, true);
 
         // Ambil input form metadata
         $titleInput = trim($_POST['title'] ?? '');
@@ -94,12 +103,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             INSERT INTO media (filename, original_name, media_type, title, description, media_date, media_time)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
-        $stmt->bind_param("sssssss", $newFilename, $origName, $mediaType, $title, $description, $mediaDate, $mediaTime);
+        $stmt->bind_param("sssssss", $dbFilename, $origName, $mediaType, $title, $description, $mediaDate, $mediaTime);
         $stmt->execute();
 
         header("Location: admin.php?tab=media&success=uploaded");
         exit;
     }
+
+    // --- A2. Buat Folder Baru Langsung (via AJAX / Form) ---
+    if ($action === 'create_folder') {
+        $folderName = trim($_POST['folder_name'] ?? '');
+        $folderName = preg_replace('/[\\/\\\\:*?"<>|]/', '', $folderName);
+        $folderName = trim(str_replace('..', '', $folderName));
+
+        $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+
+        if (empty($folderName)) {
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'Nama folder tidak boleh kosong.']);
+                exit;
+            }
+            header("Location: admin.php?tab=upload&error=empty_folder");
+            exit;
+        }
+
+        $newFolderPath = $mediaDir . $folderName;
+        if (is_dir($newFolderPath)) {
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true, 'folder' => $folderName, 'message' => 'Folder sudah ada dan siap digunakan.']);
+                exit;
+            }
+            header("Location: admin.php?tab=upload&success=folder_exists");
+            exit;
+        }
+
+        if (@mkdir($newFolderPath, 0755, true)) {
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true, 'folder' => $folderName, 'message' => 'Folder "' . $folderName . '" berhasil dibuat!']);
+                exit;
+            }
+            header("Location: admin.php?tab=upload&success=folder_created");
+            exit;
+        } else {
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'Gagal membuat folder di server. Periksa hak akses direktori media.']);
+                exit;
+            }
+            header("Location: admin.php?tab=upload&error=create_folder_failed");
+            exit;
+        }
+    }
+
 
     // --- B. Edit Metadata Media ---
     if ($action === 'edit_media') {
@@ -166,21 +224,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Hapus file lama fisik & thumbnail
-        $oldFile = $galleryDir . $oldMedia['filename'];
-        if (is_file($oldFile)) @unlink($oldFile);
+        delete_media_file_and_thumbs($oldMedia['filename']);
 
-        $oldBase = pathinfo($oldMedia['filename'], PATHINFO_FILENAME);
-        $oldThumbWebp = $thumbsDir . $oldBase . '.webp';
-        $oldThumbJpg  = $thumbsDir . $oldBase . '.jpg';
-        if (is_file($oldThumbWebp)) @unlink($oldThumbWebp);
-        if (is_file($oldThumbJpg))  @unlink($oldThumbJpg);
+        // Simpan file pengganti di subfolder yang sama jika ada
+        $oldSubdir = dirname($oldMedia['filename']);
+        $destFolder = $mediaDir . ($oldSubdir !== '.' && !empty($oldSubdir) ? $oldSubdir . DIRECTORY_SEPARATOR : '');
+        if (!is_dir($destFolder)) {
+            @mkdir($destFolder, 0755, true);
+        }
 
-        // Simpan file pengganti
         $prefix = ($newType === 'photo') ? 'IMG_' : 'VID_';
         $timestamp = date('Ymd_His');
         $uniqueSuffix = bin2hex(random_bytes(3));
         $newFilename = "{$prefix}{$timestamp}_{$uniqueSuffix}.{$ext}";
-        $destPath = $galleryDir . $newFilename;
+        $destPath = $destFolder . $newFilename;
+        $dbFilename = ($oldSubdir !== '.' && !empty($oldSubdir) ? $oldSubdir . '/' : '') . $newFilename;
 
         if (!move_uploaded_file($file['tmp_name'], $destPath)) {
             header("Location: admin.php?tab=media&error=upload_failed");
@@ -188,22 +246,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Generate thumbnail/poster baru
-        $nameWithoutExt = pathinfo($newFilename, PATHINFO_FILENAME);
-        if ($newType === 'photo') {
-            generate_photo_thumbnail($destPath, $thumbsDir . $nameWithoutExt . '.webp', 480);
-        } else {
-            generate_video_poster($destPath, $thumbsDir . $nameWithoutExt . '.jpg');
-        }
+        get_media_thumb_url($dbFilename, $newType, true);
 
         $updateStmt = $conn->prepare("UPDATE media SET filename = ?, original_name = ?, media_type = ? WHERE id = ?");
-        $updateStmt->bind_param("sssi", $newFilename, $origName, $newType, $mediaId);
+        $updateStmt->bind_param("sssi", $dbFilename, $origName, $newType, $mediaId);
         $updateStmt->execute();
 
         header("Location: admin.php?tab=media&success=replaced");
         exit;
     }
 
-    // --- D. Hapus Media ---
+    // --- D. Hapus Media Tunggal ---
     if ($action === 'delete_media') {
         $mediaId = (int) ($_POST['media_id'] ?? 0);
         if ($mediaId <= 0) {
@@ -217,22 +270,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $media = $stmt->get_result()->fetch_assoc();
 
         if ($media) {
-            $filename = $media['filename'];
-            $filePath = $galleryDir . $filename;
-            if (is_file($filePath)) @unlink($filePath);
-
-            $base = pathinfo($filename, PATHINFO_FILENAME);
-            $thumbWebp = $thumbsDir . $base . '.webp';
-            $thumbJpg  = $thumbsDir . $base . '.jpg';
-            if (is_file($thumbWebp)) @unlink($thumbWebp);
-            if (is_file($thumbJpg))  @unlink($thumbJpg);
-
+            delete_media_file_and_thumbs($media['filename']);
             $delStmt = $conn->prepare("DELETE FROM media WHERE id = ?");
             $delStmt->bind_param("i", $mediaId);
             $delStmt->execute();
         }
 
         header("Location: admin.php?tab=media&success=deleted");
+        exit;
+    }
+
+    // --- D2. Hapus Media Terpilih (Batch / Ceklis) ---
+    if ($action === 'delete_selected') {
+        $selectedIdsRaw = $_POST['selected_ids'] ?? [];
+        if (is_string($selectedIdsRaw)) {
+            $selectedIdsRaw = explode(',', $selectedIdsRaw);
+        }
+        $selectedIds = array_filter(array_map('intval', (array) $selectedIdsRaw));
+        if (empty($selectedIds)) {
+            header("Location: admin.php?tab=media&error=no_selection");
+            exit;
+        }
+
+        $inClause = implode(',', $selectedIds);
+        $query = $conn->query("SELECT id, filename FROM media WHERE id IN ($inClause)");
+        $deletedCount = 0;
+        if ($query) {
+            while ($row = $query->fetch_assoc()) {
+                delete_media_file_and_thumbs($row['filename']);
+                $deletedCount++;
+            }
+            $conn->query("DELETE FROM media WHERE id IN ($inClause)");
+        }
+
+        header("Location: admin.php?tab=media&success=deleted_batch&count=" . $deletedCount);
+        exit;
+    }
+
+    // --- D3. Hapus Semua Media ---
+    if ($action === 'delete_all') {
+        $query = $conn->query("SELECT filename FROM media");
+        $deletedCount = 0;
+        if ($query) {
+            while ($row = $query->fetch_assoc()) {
+                delete_media_file_and_thumbs($row['filename']);
+                $deletedCount++;
+            }
+        }
+
+        $conn->query("TRUNCATE TABLE media");
+        clean_thumbs_directory($thumbsDir);
+
+        header("Location: admin.php?tab=media&success=deleted_all&count=" . $deletedCount);
         exit;
     }
 
@@ -374,6 +463,8 @@ $successMessages = [
     'edited'         => 'Metadata media (judul, tanggal, jam, deskripsi) berhasil diperbarui.',
     'replaced'       => 'File media berhasil diganti dengan file yang baru.',
     'deleted'        => 'Media dan file thumbnail terkait berhasil dihapus permanen.',
+    'deleted_batch'  => 'Media terpilih dan file thumbnail terkait berhasil dihapus permanen.',
+    'deleted_all'    => 'Seluruh media dan file thumbnail terkait berhasil dihapus bersih dari server.',
     'user_added'     => 'Akun pengguna baru berhasil ditambahkan.',
     'role_updated'   => 'Peran pengguna (Role) berhasil diperbarui.',
     'password_reset' => 'Password pengguna berhasil direset.',
@@ -387,6 +478,7 @@ $errorMessages = [
     'upload_failed'  => 'Gagal memproses file upload. Periksa ukuran file dan perizinan folder.',
     'invalid_id'     => 'ID media atau pengguna tidak valid.',
     'not_found'      => 'Data tidak ditemukan.',
+    'no_selection'   => 'Silakan pilih setidaknya satu media (ceklis) untuk dihapus.',
     'invalid_email'  => 'Format email tidak valid.',
     'short_password' => 'Password minimal terdiri dari 6 karakter.',
     'email_exists'   => 'Email tersebut sudah terdaftar untuk akun lain.',
@@ -396,12 +488,22 @@ $errorMessages = [
     'replace_failed' => 'Gagal mengganti file media. Silakan coba lagi.'
 ];
 
-if (isset($_GET['success'], $successMessages[$_GET['success']])) {
-    $flashSuccess = $successMessages[$_GET['success']];
+if (isset($_GET['success'])) {
+    $sKey = $_GET['success'];
+    if ($sKey === 'deleted_batch') {
+        $c = (int) ($_GET['count'] ?? 0);
+        $flashSuccess = "$c media terpilih dan file thumbnail terkait berhasil dihapus permanen.";
+    } elseif ($sKey === 'deleted_all') {
+        $c = (int) ($_GET['count'] ?? 0);
+        $flashSuccess = "Seluruh media ($c item) dan file thumbnail terkait berhasil dihapus bersih dari server.";
+    } elseif (isset($successMessages[$sKey])) {
+        $flashSuccess = $successMessages[$sKey];
+    }
 }
 if (isset($_GET['error'], $errorMessages[$_GET['error']])) {
     $flashError = $errorMessages[$_GET['error']];
 }
+
 
 // Tab aktif ('media', 'upload', 'users')
 $activeTab = $_GET['tab'] ?? 'media';
@@ -743,33 +845,25 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
           <table class="admin-table">
             <thead>
               <tr>
-                <th style="width: 50px;">#</th>
+                <th style="width: 45px;">#</th>
                 <th>Media Preview</th>
                 <th>Tipe</th>
                 <th>Tanggal & Jam</th>
                 <th>Keterangan / Deskripsi</th>
-                <th>Aksi</th>
+                <th style="width: 170px;">Aksi</th>
               </tr>
             </thead>
             <tbody>
               <?php if (!empty($mediaList)): ?>
                 <?php foreach ($mediaList as $idx => $m): 
-                  $base = pathinfo($m['filename'], PATHINFO_FILENAME);
                   $isPhoto = $m['media_type'] === 'photo';
-                  $thumbSrc = '';
-                  if ($isPhoto) {
-                      $thumbFile = $thumbsDir . $base . '.webp';
-                      $thumbSrc = file_exists($thumbFile) ? '../gallery/thumbs/' . rawurlencode($base . '.webp') : '../gallery/' . rawurlencode($m['filename']);
-                  } else {
-                      $thumbFile = $thumbsDir . $base . '.jpg';
-                      $thumbSrc = file_exists($thumbFile) ? '../gallery/thumbs/' . rawurlencode($base . '.jpg') : '../img/logo.jpg';
-                  }
-
-                  $mediaFullSrc = '../gallery/' . rawurlencode($m['filename']);
+                  $thumbSrc = get_media_thumb_url($m['filename'], $m['media_type']);
+                  $mediaFullSrc = media_url($m['filename']);
+                  $subDir = dirname($m['filename']);
                   $formattedDate = !empty($m['media_date']) ? formatIndonesianDate($m['media_date']) : '-';
                   $formattedTime = !empty($m['media_time']) ? substr($m['media_time'], 0, 5) : '';
                 ?>
-                  <tr>
+                  <tr id="row-media-<?= $m['id'] ?>">
                     <td><?= $offset + $idx + 1 ?></td>
                     <td>
                       <div class="media-preview-cell">
@@ -778,10 +872,13 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
                         </a>
                         <div class="media-meta-wrap">
                           <span class="media-title-text" title="<?= htmlspecialchars($m['title'] ?? '') ?>">
-                            <?= htmlspecialchars($m['title'] ?: $m['filename']) ?>
+                            <?= htmlspecialchars($m['title'] ?: basename($m['filename'])) ?>
                           </span>
                           <span class="media-filename-sub" title="<?= htmlspecialchars($m['filename']) ?>">
-                            <?= htmlspecialchars($m['filename']) ?>
+                            <?php if ($subDir !== '.' && !empty($subDir)): ?>
+                              <span class="media-folder-pill"><ion-icon name="folder-outline"></ion-icon> <?= htmlspecialchars($subDir) ?></span>
+                            <?php endif; ?>
+                            <?= htmlspecialchars(basename($m['filename'])) ?>
                           </span>
                         </div>
                       </div>
@@ -826,15 +923,10 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
                           <ion-icon name="swap-horizontal-outline"></ion-icon> Ganti
                         </button>
 
-                        <!-- Form Hapus Media -->
-                        <form method="post" onsubmit="return confirm('Apakah Anda yakin ingin menghapus media ini secara permanen? File asli dan thumbnail akan dihapus.');" style="display:inline;">
-                          <?= csrf_field() ?>
-                          <input type="hidden" name="action" value="delete_media">
-                          <input type="hidden" name="media_id" value="<?= $m['id'] ?>">
-                          <button type="submit" class="btn btn-danger btn-sm" title="Hapus Media">
-                            <ion-icon name="trash-outline"></ion-icon>
-                          </button>
-                        </form>
+                        <!-- Ceklis Pemilihan Media (Menggantikan Tombol Hapus) -->
+                        <label class="action-check-wrap" title="Pilih media ini untuk dihapus">
+                          <input type="checkbox" name="selected_media[]" value="<?= $m['id'] ?>" class="media-select-cb admin-checkbox" data-id="<?= $m['id'] ?>">
+                        </label>
                       </div>
                     </td>
                   </tr>
@@ -851,42 +943,62 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
           </table>
         </div>
 
-        <!-- Pagination Media -->
-        <?php if ($totalPages > 1): ?>
-          <div class="pagination-wrap">
-            <div class="pagination-links">
-              <!-- Tombol Halaman Pertama (<<) & Sebelumnya (<) -->
-              <?php if ($page > 1): ?>
-                <a href="admin.php?tab=media&q=<?= urlencode($searchQuery) ?>&type=<?= urlencode($filterType) ?>&sort=<?= urlencode($sortOption) ?>&page=1" class="page-num" title="Halaman Pertama">&laquo;</a>
-                <a href="admin.php?tab=media&q=<?= urlencode($searchQuery) ?>&type=<?= urlencode($filterType) ?>&sort=<?= urlencode($sortOption) ?>&page=<?= $page - 1 ?>" class="page-num" title="Halaman Sebelumnya">&lsaquo;</a>
-              <?php else: ?>
-                <span class="page-num is-disabled" title="Halaman Pertama">&laquo;</span>
-                <span class="page-num is-disabled" title="Halaman Sebelumnya">&lsaquo;</span>
-              <?php endif; ?>
+        <!-- Footer Tabel Media: Pagination & Tombol Aksi Kanan Bawah -->
+        <div class="media-table-footer">
+          <div class="table-footer-main-row">
+            <div class="table-footer-left"></div>
 
-              <!-- Nomor Halaman -->
-              <?php 
-                $startP = max(1, $page - 2);
-                $endP   = min($totalPages, $page + 2);
-                for ($p = $startP; $p <= $endP; $p++): 
-              ?>
-                <a href="admin.php?tab=media&q=<?= urlencode($searchQuery) ?>&type=<?= urlencode($filterType) ?>&sort=<?= urlencode($sortOption) ?>&page=<?= $p ?>" class="page-num <?= $p === $page ? 'active' : '' ?>">
-                  <?= $p ?>
-                </a>
-              <?php endfor; ?>
+            <div class="footer-pagination-wrap">
+              <?php if ($totalPages > 1): ?>
+                <div class="pagination-links">
+                  <!-- Tombol Halaman Pertama (<<) & Sebelumnya (<) -->
+                  <?php if ($page > 1): ?>
+                    <a href="admin.php?tab=media&q=<?= urlencode($searchQuery) ?>&type=<?= urlencode($filterType) ?>&sort=<?= urlencode($sortOption) ?>&page=1" class="page-num" title="Halaman Pertama">&laquo;</a>
+                    <a href="admin.php?tab=media&q=<?= urlencode($searchQuery) ?>&type=<?= urlencode($filterType) ?>&sort=<?= urlencode($sortOption) ?>&page=<?= $page - 1 ?>" class="page-num" title="Halaman Sebelumnya">&lsaquo;</a>
+                  <?php else: ?>
+                    <span class="page-num is-disabled" title="Halaman Pertama">&laquo;</span>
+                    <span class="page-num is-disabled" title="Halaman Sebelumnya">&lsaquo;</span>
+                  <?php endif; ?>
 
-              <!-- Tombol Halaman Berikutnya (>) & Terakhir (>>) -->
-              <?php if ($page < $totalPages): ?>
-                <a href="admin.php?tab=media&q=<?= urlencode($searchQuery) ?>&type=<?= urlencode($filterType) ?>&sort=<?= urlencode($sortOption) ?>&page=<?= $page + 1 ?>" class="page-num" title="Halaman Selanjutnya">&rsaquo;</a>
-                <a href="admin.php?tab=media&q=<?= urlencode($searchQuery) ?>&type=<?= urlencode($filterType) ?>&sort=<?= urlencode($sortOption) ?>&page=<?= $totalPages ?>" class="page-num" title="Halaman Terakhir">&raquo;</a>
-              <?php else: ?>
-                <span class="page-num is-disabled" title="Halaman Selanjutnya">&rsaquo;</span>
-                <span class="page-num is-disabled" title="Halaman Terakhir">&raquo;</span>
+                  <!-- Nomor Halaman -->
+                  <?php 
+                    $startP = max(1, $page - 2);
+                    $endP   = min($totalPages, $page + 2);
+                    for ($p = $startP; $p <= $endP; $p++): 
+                  ?>
+                    <a href="admin.php?tab=media&q=<?= urlencode($searchQuery) ?>&type=<?= urlencode($filterType) ?>&sort=<?= urlencode($sortOption) ?>&page=<?= $p ?>" class="page-num <?= $p === $page ? 'active' : '' ?>">
+                      <?= $p ?>
+                    </a>
+                  <?php endfor; ?>
+
+                  <!-- Tombol Halaman Berikutnya (>) & Terakhir (>>) -->
+                  <?php if ($page < $totalPages): ?>
+                    <a href="admin.php?tab=media&q=<?= urlencode($searchQuery) ?>&type=<?= urlencode($filterType) ?>&sort=<?= urlencode($sortOption) ?>&page=<?= $page + 1 ?>" class="page-num" title="Halaman Selanjutnya">&rsaquo;</a>
+                    <a href="admin.php?tab=media&q=<?= urlencode($searchQuery) ?>&type=<?= urlencode($filterType) ?>&sort=<?= urlencode($sortOption) ?>&page=<?= $totalPages ?>" class="page-num" title="Halaman Terakhir">&raquo;</a>
+                  <?php else: ?>
+                    <span class="page-num is-disabled" title="Halaman Selanjutnya">&rsaquo;</span>
+                    <span class="page-num is-disabled" title="Halaman Terakhir">&raquo;</span>
+                  <?php endif; ?>
+                </div>
               <?php endif; ?>
             </div>
-            <span class="pagination-info">Menampilkan halaman <?= $page ?> dari <?= $totalPages ?> (Total <?= $totalMediaCount ?> media)</span>
+
+            <!-- Tombol Aksi Kanan Bawah: Pilih Semua, Hapus Semua -->
+            <div class="table-footer-actions">
+              <!-- Tombol Pilih Semua -->
+              <button type="button" class="btn btn-secondary btn-sm" id="btnToggleSelectAll" title="Pilih atau batalkan semua media di halaman ini">
+                <ion-icon name="checkbox-outline"></ion-icon> <span id="btnSelectAllText">Pilih Semua</span>
+              </button>
+
+              <!-- Tombol Hapus Semua Media -->
+              <button type="button" class="btn btn-danger-outline btn-sm" id="btnOpenDeleteAll" onclick="openModal('modalDeleteAllMedia')" title="Hapus seluruh koleksi media secara permanen">
+                <ion-icon name="trash-bin-outline"></ion-icon> Hapus Semua
+              </button>
+            </div>
           </div>
-        <?php endif; ?>
+
+          <div class="pagination-info">Menampilkan halaman <?= $page ?> dari <?= $totalPages ?> (Total <?= $totalMediaCount ?> media)</div>
+        </div>
       </div>
     </section>
 
@@ -938,6 +1050,55 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
               <input type="time" id="upload_time" name="media_time" class="form-control" value="<?= date('H:i') ?>" step="1">
             </div>
 
+            <div class="form-group">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                <label for="upload_folder" style="margin: 0;">Folder / Album Tujuan</label>
+                <button type="button" class="btn-create-folder-toggle" id="btnToggleNewFolder" title="Buat folder/album baru langsung">
+                  <ion-icon name="folder-outline"></ion-icon> + Buat Folder Baru
+                </button>
+              </div>
+
+              <!-- Pilihan Folder / Album -->
+              <select id="upload_folder" name="target_folder" class="form-control" style="background:#12141c; color:#ffffff;">
+                <option value="">(Root / Folder Utama Media)</option>
+                <option value="__new__" style="color:#60a5fa; font-weight:600;">➕ Buat Folder / Album Baru...</option>
+                <optgroup label="Folder / Album yang Tersedia:" id="existingFoldersGroup">
+                  <?php 
+                  $existingFolders = [];
+                  if (is_dir($mediaDir)) {
+                      foreach (scandir($mediaDir) as $fItem) {
+                          if ($fItem === '.' || $fItem === '..' || $fItem === 'thumbs' || str_starts_with($fItem, '.')) continue;
+                          if (is_dir($mediaDir . DIRECTORY_SEPARATOR . $fItem)) {
+                              $existingFolders[] = $fItem;
+                          }
+                      }
+                  }
+                  foreach ($existingFolders as $ef): 
+                  ?>
+                    <option value="<?= htmlspecialchars($ef) ?>"><?= htmlspecialchars($ef) ?></option>
+                  <?php endforeach; ?>
+                </optgroup>
+              </select>
+
+              <!-- Panel Input Pembuatan Folder Baru -->
+              <div id="newFolderWrap" style="display: none; margin-top: 8px;">
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <div style="position: relative; flex: 1;">
+                    <input type="text" id="new_folder_input" name="new_folder_name" class="form-control" placeholder="Nama folder baru (misal: S7 - Rapat Kerja)" autocomplete="off">
+                  </div>
+                  <button type="button" class="btn btn-primary btn-sm" id="btnSaveNewFolderDirect" title="Buat folder sekarang di server">
+                    <ion-icon name="checkmark-outline"></ion-icon> Buat Folder
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm" id="btnCancelNewFolder" title="Batal">
+                    <ion-icon name="close-outline"></ion-icon>
+                  </button>
+                </div>
+                <div id="newFolderStatus" style="font-size: 0.78rem; margin-top: 6px; display: none;"></div>
+              </div>
+
+              <small style="color:var(--admin-text-subtle); font-size:0.75rem; display:block; margin-top:4px;">Pilih subfolder album yang ada, atau buat folder baru langsung.</small>
+            </div>
+
             <div class="form-group form-full">
               <label for="upload_desc">Deskripsi / Keterangan (Opsional)</label>
               <textarea id="upload_desc" name="description" class="form-control" placeholder="Tuliskan keterangan detail mengenai momen, lokasi, atau anggota komunitas yang ada di dokumentasi ini..."></textarea>
@@ -971,9 +1132,9 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
               <tr>
                 <th style="width: 50px;">ID</th>
                 <th class="text-left" style="padding-left: 20px;">Pengguna</th>
-                <th>Peran / Role</th>
-                <th>Bergabung Sejak</th>
-                <th>Kelola Peran & Akun</th>
+                <th style="width: 150px; text-align: center;">Peran / Role</th>
+                <th style="width: 180px; text-align: center;">Bergabung Sejak</th>
+                <th style="text-align: center;">Kelola Peran & Akun</th>
               </tr>
             </thead>
             <tbody>
@@ -996,26 +1157,26 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
                       </div>
                     </div>
                   </td>
-                  <td>
+                  <td style="text-align: center;">
                     <?php if ($isAdmin): ?>
                       <span class="badge-pill badge-admin"><ion-icon name="shield-checkmark"></ion-icon> Admin</span>
                     <?php else: ?>
                       <span class="badge-pill badge-member"><ion-icon name="person"></ion-icon> Member</span>
                     <?php endif; ?>
                   </td>
-                  <td style="color:var(--admin-text-muted); font-size:0.84rem;">
+                  <td style="text-align: center; color:var(--admin-text-muted); font-size:0.84rem;">
                     <?= htmlspecialchars($joinedDate) ?>
                   </td>
                   <td>
-                    <div class="actions-cell">
+                    <div class="actions-cell user-actions-cell">
                       <!-- Ganti Role Switcher -->
                       <?php if (!$isSelf): ?>
-                        <form method="post" style="display:inline;" onsubmit="return confirm('Ubah peran pengguna <?= htmlspecialchars($u['email']) ?> menjadi <?= $isAdmin ? 'Member' : 'Admin' ?>?');">
+                        <form method="post" style="display:inline; margin:0;" onsubmit="return confirm('Ubah peran pengguna <?= htmlspecialchars($u['email']) ?> menjadi <?= $isAdmin ? 'Member' : 'Admin' ?>?');">
                           <?= csrf_field() ?>
                           <input type="hidden" name="action" value="update_role">
                           <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
                           <input type="hidden" name="new_role" value="<?= $isAdmin ? 'member' : 'admin' ?>">
-                          <button type="submit" class="btn btn-secondary btn-sm" title="Ubah Peran">
+                          <button type="submit" class="btn btn-secondary btn-sm btn-user-action-role" title="Ubah Peran">
                             <?php if ($isAdmin): ?>
                               <ion-icon name="arrow-down-circle-outline"></ion-icon> Jadikan Member
                             <?php else: ?>
@@ -1024,13 +1185,13 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
                           </button>
                         </form>
                       <?php else: ?>
-                        <button type="button" class="btn btn-secondary btn-sm" disabled style="opacity:0.4; cursor:not-allowed;" title="Tidak dapat mendemosi akun aktif">
+                        <button type="button" class="btn btn-secondary btn-sm btn-user-action-role" disabled style="opacity:0.4; cursor:not-allowed;" title="Akun Anda yang sedang aktif">
                           <ion-icon name="lock-closed-outline"></ion-icon> Akun Anda
                         </button>
                       <?php endif; ?>
 
                       <!-- Reset Password Button -->
-                      <button type="button" class="btn btn-secondary btn-sm btn-reset-pwd" 
+                      <button type="button" class="btn btn-secondary btn-sm btn-reset-pwd btn-user-action-pwd" 
                         data-id="<?= $u['id'] ?>"
                         data-email="<?= htmlspecialchars($u['email']) ?>"
                         title="Reset Password Akun">
@@ -1039,14 +1200,16 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
 
                       <!-- Hapus Pengguna -->
                       <?php if (!$isSelf): ?>
-                        <form method="post" onsubmit="return confirm('Apakah Anda yakin ingin menghapus akun <?= htmlspecialchars($u['email']) ?> secara permanen?');" style="display:inline;">
+                        <form method="post" onsubmit="return confirm('Apakah Anda yakin ingin menghapus akun <?= htmlspecialchars($u['email']) ?> secara permanen?');" style="display:inline; margin:0;">
                           <?= csrf_field() ?>
                           <input type="hidden" name="action" value="delete_user">
                           <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
-                          <button type="submit" class="btn btn-danger btn-sm" title="Hapus Akun Pengguna">
+                          <button type="submit" class="btn btn-danger btn-sm btn-user-action-del" title="Hapus Akun Pengguna">
                             <ion-icon name="trash-outline"></ion-icon>
                           </button>
                         </form>
+                      <?php else: ?>
+                        <span class="user-action-spacer" aria-hidden="true"></span>
                       <?php endif; ?>
                     </div>
                   </td>
@@ -1135,6 +1298,50 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-close="modalReplaceMedia">Batal</button>
           <button type="submit" class="btn btn-primary">Ganti File Sekarang</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL: HAPUS SEMUA MEDIA (KONFIRMASI EKSTRA AMAN)
+       ====================================================================== -->
+  <div class="modal-backdrop" id="modalDeleteAllMedia">
+    <div class="modal-box" style="border: 1px solid rgba(239, 68, 68, 0.4);">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="danger-icon-circle">
+            <ion-icon name="warning"></ion-icon>
+          </div>
+          <h3 style="color:#ef4444; margin:0;">Hapus Seluruh Media</h3>
+        </div>
+        <button type="button" class="btn-close-modal" data-close="modalDeleteAllMedia">&times;</button>
+      </div>
+      <form method="post">
+        <?= csrf_field() ?>
+        <input type="hidden" name="action" value="delete_all">
+
+        <div class="modal-body">
+          <p style="font-size:0.92rem; color:#ffffff; font-weight:600; margin-top:0; margin-bottom:8px;">
+            Apakah Anda benar-benar yakin ingin menghapus SEMUA media?
+          </p>
+          <p style="font-size:0.84rem; color:var(--admin-text-muted); line-height:1.6; margin-bottom:14px;">
+            Tindakan ini akan menghapus <strong>seluruh <?= $totalMediaCount ?> file foto dan video</strong> yang tercatat di database beserta seluruh file fisik dan thumbnail dari server. Tindakan ini bersifat <span style="color:#ef4444; font-weight:600;">permanen dan tidak dapat dibatalkan</span>.
+          </p>
+          <div style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); border-radius:8px; padding:12px; font-size:0.82rem; color:#fca5a5;">
+            <ion-icon name="alert-circle-outline" style="vertical-align:middle; font-size:1.1rem;"></ion-icon>
+            Untuk melanjutkan, silakan ketik <strong>HAPUS SEMUA</strong> pada kotak di bawah ini:
+          </div>
+          <div class="form-group" style="margin-top:14px;">
+            <input type="text" id="confirmDeleteAllInput" class="form-control" style="border-color:rgba(239,68,68,0.4);" placeholder="Ketik: HAPUS SEMUA" autocomplete="off" oninput="validateDeleteAllConfirm(this.value)">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="modalDeleteAllMedia">Batal</button>
+          <button type="submit" class="btn btn-danger" id="btnSubmitDeleteAll" disabled>
+            <ion-icon name="trash-bin-outline"></ion-icon> Ya, Hapus Semua Media Permanen
+          </button>
         </div>
       </form>
     </div>
@@ -1321,11 +1528,230 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
         }
       }
 
+      // ====================================================================
+      // 2A-2. Pembuatan Folder / Album Baru Langsung di Form Upload
+      // ====================================================================
+      const btnToggleNewFolder = document.getElementById('btnToggleNewFolder');
+      const uploadFolderSelect = document.getElementById('upload_folder');
+      const newFolderWrap = document.getElementById('newFolderWrap');
+      const newFolderInput = document.getElementById('new_folder_input');
+      const btnCancelNewFolder = document.getElementById('btnCancelNewFolder');
+      const btnSaveNewFolderDirect = document.getElementById('btnSaveNewFolderDirect');
+      const newFolderStatus = document.getElementById('newFolderStatus');
+      const existingFoldersGroup = document.getElementById('existingFoldersGroup');
+
+      function showNewFolderField() {
+        if (newFolderWrap) {
+          newFolderWrap.style.display = 'block';
+          if (newFolderInput) {
+            newFolderInput.focus();
+          }
+        }
+      }
+
+      function hideNewFolderField() {
+        if (newFolderWrap) {
+          newFolderWrap.style.display = 'none';
+          if (newFolderInput) {
+            newFolderInput.value = '';
+          }
+          if (newFolderStatus) {
+            newFolderStatus.style.display = 'none';
+          }
+          if (uploadFolderSelect && uploadFolderSelect.value === '__new__') {
+            uploadFolderSelect.value = '';
+          }
+        }
+      }
+
+      if (btnToggleNewFolder) {
+        btnToggleNewFolder.addEventListener('click', () => {
+          if (newFolderWrap && (newFolderWrap.style.display === 'none' || !newFolderWrap.style.display)) {
+            showNewFolderField();
+          } else {
+            hideNewFolderField();
+          }
+        });
+      }
+
+      if (uploadFolderSelect) {
+        uploadFolderSelect.addEventListener('change', () => {
+          if (uploadFolderSelect.value === '__new__') {
+            showNewFolderField();
+          }
+        });
+      }
+
+      if (btnCancelNewFolder) {
+        btnCancelNewFolder.addEventListener('click', hideNewFolderField);
+      }
+
+      // Tombol Buat Folder Langsung via AJAX
+      if (btnSaveNewFolderDirect && newFolderInput) {
+        btnSaveNewFolderDirect.addEventListener('click', async () => {
+          const val = newFolderInput.value.trim();
+          if (!val) {
+            if (newFolderStatus) {
+              newFolderStatus.textContent = 'Silakan ketik nama folder terlebih dahulu.';
+              newFolderStatus.style.color = '#f87171';
+              newFolderStatus.style.display = 'block';
+            }
+            newFolderInput.focus();
+            return;
+          }
+
+          btnSaveNewFolderDirect.disabled = true;
+          btnSaveNewFolderDirect.innerHTML = '<ion-icon name="sync-outline"></ion-icon> Membuat...';
+
+          try {
+            const formData = new FormData();
+            formData.append('action', 'create_folder');
+            formData.append('folder_name', val);
+            formData.append('csrf_token', '<?= csrf_token() ?>');
+
+            const res = await fetch('admin.php', {
+              method: 'POST',
+              body: formData,
+              headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+              }
+            });
+
+            const data = await res.json();
+            if (data.success) {
+              // Tambahkan ke dropdown select jika belum ada
+              let exists = false;
+              if (uploadFolderSelect) {
+                Array.from(uploadFolderSelect.options).forEach(opt => {
+                  if (opt.value === data.folder) exists = true;
+                });
+
+                if (!exists) {
+                  const newOpt = document.createElement('option');
+                  newOpt.value = data.folder;
+                  newOpt.textContent = data.folder;
+                  if (existingFoldersGroup) {
+                    existingFoldersGroup.appendChild(newOpt);
+                  } else {
+                    uploadFolderSelect.appendChild(newOpt);
+                  }
+                }
+
+                uploadFolderSelect.value = data.folder;
+              }
+
+              if (newFolderStatus) {
+                newFolderStatus.innerHTML = '<ion-icon name="checkmark-circle-outline"></ion-icon> ' + (data.message || 'Folder berhasil dibuat!');
+                newFolderStatus.style.color = '#34d399';
+                newFolderStatus.style.display = 'block';
+              }
+
+              setTimeout(() => {
+                hideNewFolderField();
+              }, 1200);
+            } else {
+              if (newFolderStatus) {
+                newFolderStatus.innerHTML = '<ion-icon name="alert-circle-outline"></ion-icon> ' + (data.message || 'Gagal membuat folder.');
+                newFolderStatus.style.color = '#f87171';
+                newFolderStatus.style.display = 'block';
+              }
+            }
+          } catch (err) {
+            if (newFolderStatus) {
+              newFolderStatus.textContent = 'Terjadi kesalahan saat membuat folder.';
+              newFolderStatus.style.color = '#f87171';
+              newFolderStatus.style.display = 'block';
+            }
+          } finally {
+            btnSaveNewFolderDirect.disabled = false;
+            btnSaveNewFolderDirect.innerHTML = '<ion-icon name="checkmark-outline"></ion-icon> Buat Folder';
+          }
+        });
+      }
+
+      // ====================================================================
+      // 2B. Batch Selection (Ceklis Media & Hapus Terpilih / Hapus Semua)
+      // ====================================================================
+      const btnToggleSelectAll = document.getElementById('btnToggleSelectAll');
+      const btnDeleteSelected = document.getElementById('btnDeleteSelected');
+      const deleteSelectedNum = document.getElementById('deleteSelectedNum');
+      const selectedIdsInput = document.getElementById('selectedIdsInput');
+      const mediaCheckboxes = document.querySelectorAll('.media-select-cb');
+
+      function updateBatchSelectionState() {
+        const checkedList = Array.from(mediaCheckboxes).filter(cb => cb.checked);
+        const count = checkedList.length;
+        const totalVisible = mediaCheckboxes.length;
+
+        if (deleteSelectedNum) {
+          deleteSelectedNum.textContent = count;
+        }
+
+        if (btnDeleteSelected) {
+          btnDeleteSelected.disabled = (count === 0);
+        }
+
+        const btnSelectAllText = document.getElementById('btnSelectAllText');
+        if (btnSelectAllText) {
+          btnSelectAllText.textContent = (count === totalVisible && totalVisible > 0) ? 'Batal Pilih' : 'Pilih Semua';
+        }
+
+        // Highlight table row and checkbox wrapper
+        mediaCheckboxes.forEach(cb => {
+          const row = document.getElementById('row-media-' + cb.value);
+          const wrap = cb.closest('.action-check-wrap');
+          if (cb.checked) {
+            if (row) row.classList.add('selected-row');
+            if (wrap) wrap.classList.add('is-checked');
+          } else {
+            if (row) row.classList.remove('selected-row');
+            if (wrap) wrap.classList.remove('is-checked');
+          }
+        });
+      }
+
+      if (btnToggleSelectAll) {
+        btnToggleSelectAll.addEventListener('click', () => {
+          const allChecked = Array.from(mediaCheckboxes).length > 0 && Array.from(mediaCheckboxes).every(cb => cb.checked);
+          mediaCheckboxes.forEach(cb => {
+            cb.checked = !allChecked;
+          });
+          updateBatchSelectionState();
+        });
+      }
+
+      mediaCheckboxes.forEach(cb => {
+        cb.addEventListener('change', updateBatchSelectionState);
+      });
+
+      // Window global functions for inline onclick handlers
+      window.handleDeleteSelected = function() {
+        const checkedList = Array.from(document.querySelectorAll('.media-select-cb:checked'));
+        if (checkedList.length === 0) return;
+        const count = checkedList.length;
+        if (!confirm(`Apakah Anda yakin ingin menghapus ${count} media terpilih secara permanen? File fisik dan thumbnail terkait akan dihapus dari server.`)) {
+          return;
+        }
+        const ids = checkedList.map(cb => cb.value);
+        if (selectedIdsInput) {
+          selectedIdsInput.value = ids.join(',');
+        }
+        document.getElementById('formDeleteSelected').submit();
+      };
+
+      window.validateDeleteAllConfirm = function(val) {
+        const btn = document.getElementById('btnSubmitDeleteAll');
+        if (btn) {
+          btn.disabled = (val.trim().toUpperCase() !== 'HAPUS SEMUA');
+        }
+      };
+
       // 3. Modal Helpers
       function openModal(id) {
         const modal = document.getElementById(id);
         if (modal) modal.classList.add('open');
       }
+
 
       function closeModal(id) {
         const modal = document.getElementById(id);

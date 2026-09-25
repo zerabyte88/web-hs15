@@ -14,8 +14,10 @@ $currentUserRole  = $_SESSION['role'] ?? 'member';
 $isSuperAdmin     = ($currentUserRole === 'admin');
 $roleBadgeText    = $isSuperAdmin ? 'Super Admin' : 'Member';
 
-$dir = __DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "gallery" . DIRECTORY_SEPARATOR;
-$stats = getGalleryStats($dir);
+sync_media_files_to_db($conn);
+$dir = get_media_base_dir();
+$thumbDir = get_thumbs_base_dir();
+$stats = getGalleryStats();
 
 // Pagination & Query dari tabel media
 $perPage = 12; // 12 video per halaman
@@ -186,31 +188,19 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
           $desc = !empty($v['description']) ? $v['description'] : '';
           $captionTooltip = $formattedCaption . ($desc ? " — $desc" : "");
 
-          $targetThumb = $thumbDir . $nameWithoutExt . '.jpg';
-          $thumbPath = '';
-
-          // Cek ketersediaan thumbnail poster video
-          if (file_exists($targetThumb)) {
-              $thumbPath = '../gallery/thumbs/' . rawurlencode($nameWithoutExt . '.jpg');
-          } else {
-              $videoPath = $dir . $file;
-              if (generate_video_poster($videoPath, $targetThumb)) {
-                  $thumbPath = '../gallery/thumbs/' . rawurlencode($nameWithoutExt . '.jpg');
-              }
-          }
-
-          $videoSrc = '../gallery/' . rawurlencode($file);
+          $thumbPath = get_media_thumb_url($file, 'video');
+          $videoSrc = media_url($file);
         ?>
           <div class="vWrap">
             <div class="video-box">
-              <video controls preload="none" <?php if ($thumbPath): ?>data-poster="<?= $thumbPath ?>"<?php endif; ?> playsinline>
-                <source src="<?= $videoSrc ?>">
-                Browser Anda tidak mendukung pemutar video.
-              </video>
+          <video controls preload="none" data-poster="<?= $thumbPath ?>" data-filename="<?= htmlspecialchars($file) ?>" playsinline>
+            <source src="<?= $videoSrc ?>">
+            Browser Anda tidak mendukung pemutar video.
+          </video>
             </div>
             <div class="vFooter">
               <div class="vCaption" title="<?= htmlspecialchars($captionTooltip) ?>"><?= htmlspecialchars($formattedCaption) ?></div>
-              <a href="<?= $videoSrc ?>" download="<?= htmlspecialchars($file) ?>" class="v-download-btn" title="Download Video <?= htmlspecialchars($formattedCaption) ?>">
+              <a href="<?= $videoSrc ?>" download="<?= htmlspecialchars(basename($file)) ?>" class="v-download-btn" title="Download Video <?= htmlspecialchars($formattedCaption) ?>">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                   <polyline points="7 10 12 15 17 10"></polyline>

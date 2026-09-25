@@ -51,7 +51,7 @@ function init_security_tables(mysqli $conn): void {
 
     $mediaSql = "CREATE TABLE IF NOT EXISTS media (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        filename VARCHAR(255) NOT NULL UNIQUE,
+        filename VARCHAR(500) NOT NULL UNIQUE,
         original_name VARCHAR(255) NULL,
         media_type ENUM('photo', 'video') NOT NULL,
         title VARCHAR(255) NULL,
@@ -67,6 +67,7 @@ function init_security_tables(mysqli $conn): void {
     @$conn->query($loginAttemptsSql);
     @$conn->query($passwordResetsSql);
     @$conn->query($mediaSql);
+    @$conn->query("ALTER TABLE media MODIFY filename VARCHAR(500) NOT NULL");
 
     // Pastikan ada setidaknya satu akun admin
     $adminCheck = @$conn->query("SELECT id FROM users WHERE role = 'admin' LIMIT 1");
@@ -482,33 +483,220 @@ function generate_photo_thumbnail(string $src, string $dest, int $thumbWidth = 4
 }
 
 /* ==========================================================================
-   6. Sinkronisasi File Media ke Database (media table)
+   6. Sinkronisasi File Media ke Database (media table) & Media Helpers
    ========================================================================== */
 
 /**
- * Memastikan semua file fisik yang ada di folder gallery tersimpan di tabel media
+ * Mengambil path folder root media fisik
  */
-function sync_media_files_to_db(mysqli $conn, ?string $galleryDir = null): int {
-    init_security_tables($conn);
-    if ($galleryDir === null) {
-        $galleryDir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'gallery' . DIRECTORY_SEPARATOR;
+function get_media_base_dir(): string {
+    $dir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'media' . DIRECTORY_SEPARATOR;
+    if (!is_dir($dir)) {
+        $legacy = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'gallery' . DIRECTORY_SEPARATOR;
+        if (is_dir($legacy)) {
+            return $legacy;
+        }
     }
-    $galleryDir = rtrim($galleryDir, '/\\') . DIRECTORY_SEPARATOR;
-    if (!is_dir($galleryDir)) return 0;
+    return $dir;
+}
+
+/**
+ * Mengambil path folder root thumbs media
+ */
+function get_thumbs_base_dir(): string {
+    $dir = get_media_base_dir() . 'thumbs' . DIRECTORY_SEPARATOR;
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0755, true);
+    }
+    return $dir;
+}
+
+/**
+ * Menghasilkan URL publik untuk file media (mendukung subfolder & encoding aman)
+ */
+function media_url(string $relPath): string {
+    $clean = ltrim(str_replace(['\\'], '/', $relPath), '/');
+    $segments = explode('/', $clean);
+    $encoded = array_map('rawurlencode', $segments);
+    return '../media/' . implode('/', $encoded);
+}
+
+/**
+ * Mengambil atau menghasilkan URL thumbnail gambar WebP / poster video
+ */
+function get_media_thumb_url(string $filename, string $mediaType = 'photo', bool $generateIfMissing = true): string {
+    $clean = ltrim(str_replace(['\\'], '/', $filename), '/');
+    $relDir = dirname($clean);
+    $base = pathinfo($clean, PATHINFO_FILENAME);
+
+    $thumbsBaseDir = get_thumbs_base_dir();
+    $mediaBaseDir  = get_media_base_dir();
+
+    $subDirPart = ($relDir !== '.' && $relDir !== '') ? str_replace('/', DIRECTORY_SEPARATOR, $relDir) . DIRECTORY_SEPARATOR : '';
+    $subDirUrl  = ($relDir !== '.' && $relDir !== '') ? $relDir . '/' : '';
+
+    if ($mediaType === 'photo') {
+        $targetDiskThumb = $thumbsBaseDir . $subDirPart . $base . '.webp';
+        $flatDiskThumb   = $thumbsBaseDir . $base . '.webp';
+
+        if (file_exists($targetDiskThumb)) {
+            return media_url('thumbs/' . $subDirUrl . $base . '.webp');
+        }
+        if (file_exists($flatDiskThumb)) {
+            return media_url('thumbs/' . $base . '.webp');
+        }
+
+        if ($generateIfMissing) {
+            $srcDisk = $mediaBaseDir . str_replace('/', DIRECTORY_SEPARATOR, $clean);
+            if (file_exists($srcDisk)) {
+                if (!is_dir(dirname($targetDiskThumb))) {
+                    @mkdir(dirname($targetDiskThumb), 0755, true);
+                }
+                if (generate_photo_thumbnail($srcDisk, $targetDiskThumb, 480)) {
+                    return media_url('thumbs/' . $subDirUrl . $base . '.webp');
+                }
+            }
+        }
+
+        return media_url($clean);
+    } else {
+        $targetDiskPoster = $thumbsBaseDir . $subDirPart . $base . '.jpg';
+        $flatDiskPoster   = $thumbsBaseDir . $base . '.jpg';
+
+        if (file_exists($targetDiskPoster)) {
+            return media_url('thumbs/' . $subDirUrl . $base . '.jpg');
+        }
+        if (file_exists($flatDiskPoster)) {
+            return media_url('thumbs/' . $base . '.jpg');
+        }
+
+        if ($generateIfMissing) {
+            $srcDisk = $mediaBaseDir . str_replace('/', DIRECTORY_SEPARATOR, $clean);
+            if (file_exists($srcDisk)) {
+                if (!is_dir(dirname($targetDiskPoster))) {
+                    @mkdir(dirname($targetDiskPoster), 0755, true);
+                }
+                if (generate_video_poster($srcDisk, $targetDiskPoster)) {
+                    return media_url('thumbs/' . $subDirUrl . $base . '.jpg');
+                }
+            }
+        }
+
+        return '../img/logo.jpg';
+    }
+}
+
+/**
+ * Menghapus file media fisik beserta thumbnail WebP / poster JPG
+ */
+function delete_media_file_and_thumbs(string $filename): void {
+    $clean = ltrim(str_replace(['\\'], '/', $filename), '/');
+    $mediaBaseDir  = get_media_base_dir();
+    $thumbsBaseDir = get_thumbs_base_dir();
+
+    $filePath = $mediaBaseDir . str_replace('/', DIRECTORY_SEPARATOR, $clean);
+    if (is_file($filePath)) {
+        @unlink($filePath);
+    }
+
+    $relDir = dirname($clean);
+    $base = pathinfo($clean, PATHINFO_FILENAME);
+    $subDirPart = ($relDir !== '.' && $relDir !== '') ? str_replace('/', DIRECTORY_SEPARATOR, $relDir) . DIRECTORY_SEPARATOR : '';
+
+    $thumbCandidates = [
+        $thumbsBaseDir . $subDirPart . $base . '.webp',
+        $thumbsBaseDir . $subDirPart . $base . '.jpg',
+        $thumbsBaseDir . $base . '.webp',
+        $thumbsBaseDir . $base . '.jpg'
+    ];
+    foreach ($thumbCandidates as $tc) {
+        if (is_file($tc)) {
+            @unlink($tc);
+        }
+    }
+}
+
+/**
+ * Membersihkan seluruh isi direktori thumbs secara rekursif
+ */
+function clean_thumbs_directory(string $dir): void {
+    if (!is_dir($dir)) return;
+    $items = scandir($dir);
+    if ($items === false) return;
+    foreach ($items as $item) {
+        if ($item === '.' || $item === '..' || $item === '.htaccess') continue;
+        $path = $dir . DIRECTORY_SEPARATOR . $item;
+        if (is_dir($path)) {
+            clean_thumbs_directory($path);
+            @rmdir($path);
+        } elseif (is_file($path)) {
+            @unlink($path);
+        }
+    }
+}
+
+/**
+ * Scan direktori media secara rekursif untuk membaca seluruh foto & video
+ * termasuk yang berada di dalam subfolder
+ */
+function scan_media_files_recursive(string $baseDir): array {
+    $results = [];
+    $baseDir = rtrim($baseDir, '/\\') . DIRECTORY_SEPARATOR;
+    if (!is_dir($baseDir)) return $results;
+
+    try {
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($baseDir, RecursiveDirectoryIterator::SKIP_DOTS | FilesystemIterator::FOLLOW_SYMLINKS),
+            RecursiveIteratorIterator::SELF_FIRST
+        );
+
+        foreach ($iterator as $item) {
+            if ($item->isDir()) continue;
+
+            $pathname = $item->getPathname();
+            $relPath = substr($pathname, strlen($baseDir));
+            $relPath = str_replace('\\', '/', $relPath);
+
+            // Lewati folder thumbs, file tersembunyi, dan file .htaccess
+            if (str_starts_with($relPath, 'thumbs/') || $relPath === 'thumbs') continue;
+            if (basename($relPath) === '.htaccess' || str_starts_with(basename($relPath), '.')) continue;
+
+            $results[] = [
+                'rel_path'  => $relPath,
+                'full_path' => $pathname,
+                'filename'  => basename($relPath),
+                'mtime'     => $item->getMTime()
+            ];
+        }
+    } catch (\Throwable $e) {}
+
+    return $results;
+}
+
+/**
+ * Memastikan semua file fisik yang ada di folder media (termasuk subfolder) tersimpan di tabel media
+ */
+function sync_media_files_to_db(mysqli $conn, ?string $mediaDir = null): int {
+    init_security_tables($conn);
+    if ($mediaDir === null) {
+        $mediaDir = get_media_base_dir();
+    }
+    $mediaDir = rtrim($mediaDir, '/\\') . DIRECTORY_SEPARATOR;
+    if (!is_dir($mediaDir)) return 0;
 
     $existing = [];
-    $res = $conn->query("SELECT filename FROM media");
+    $res = $conn->query("SELECT id, filename FROM media");
     if ($res) {
         while ($row = $res->fetch_assoc()) {
-            $existing[$row['filename']] = true;
+            $existing[$row['filename']] = (int) $row['id'];
         }
     }
 
     $photoExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
     $videoExts = ['mp4', 'webm', 'ogg', 'm4v'];
 
-    $files = scandir($galleryDir);
-    if ($files === false) return 0;
+    $scannedFiles = scan_media_files_recursive($mediaDir);
+    if (empty($scannedFiles)) return 0;
 
     $stmt = $conn->prepare("
         INSERT INTO media (filename, original_name, media_type, title, description, media_date, media_time)
@@ -517,13 +705,15 @@ function sync_media_files_to_db(mysqli $conn, ?string $galleryDir = null): int {
     if (!$stmt) return 0;
 
     $inserted = 0;
-    foreach ($files as $file) {
-        if ($file === '.' || $file === '..' || $file === 'thumbs' || str_starts_with($file, '.')) continue;
-        $fullPath = $galleryDir . $file;
-        if (!is_file($fullPath)) continue;
-        if (isset($existing[$file])) continue;
+    foreach ($scannedFiles as $fileInfo) {
+        $relPath   = $fileInfo['rel_path'];
+        $baseName  = $fileInfo['filename'];
+        $fullPath  = $fileInfo['full_path'];
+        $mtime     = $fileInfo['mtime'];
 
-        $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+        if (isset($existing[$relPath])) continue;
+
+        $ext = strtolower(pathinfo($baseName, PATHINFO_EXTENSION));
         $mediaType = null;
         if (in_array($ext, $photoExts, true)) {
             $mediaType = 'photo';
@@ -533,23 +723,34 @@ function sync_media_files_to_db(mysqli $conn, ?string $galleryDir = null): int {
             continue;
         }
 
-        $parsed = parseMediaFilenameDate($file);
-        $fileMtime = filemtime($fullPath);
-        $mediaDate = $parsed['date'] ?: date('Y-m-d', $fileMtime);
-        $mediaTime = $parsed['time'] ?: date('H:i:s', $fileMtime);
-        $title = $parsed['title'];
-        $desc = null;
-        $origName = $file;
+        $parsed = parseMediaFilenameDate($baseName);
+        $mediaDate = $parsed['date'] ?: date('Y-m-d', $mtime);
+        $mediaTime = $parsed['time'] ?: date('H:i:s', $mtime);
 
-        $stmt->bind_param("sssssss", $file, $origName, $mediaType, $title, $desc, $mediaDate, $mediaTime);
+        // Jika file ada di dalam subfolder, gunakan nama folder sebagai konteks judul
+        $folderName = dirname($relPath);
+        $title = $parsed['title'];
+        if ($folderName !== '.' && !empty($folderName)) {
+            if (empty($title) || str_starts_with($title, 'Dokumentasi ')) {
+                $title = $folderName . ' (' . formatIndonesianDate($mediaDate) . ')';
+            } else {
+                $title = $folderName . ' - ' . $title;
+            }
+        }
+
+        $desc = null;
+        $origName = $baseName;
+
+        $stmt->bind_param("sssssss", $relPath, $origName, $mediaType, $title, $desc, $mediaDate, $mediaTime);
         if ($stmt->execute()) {
             $inserted++;
-            $existing[$file] = true;
+            $existing[$relPath] = $stmt->insert_id;
         }
     }
 
     return $inserted;
 }
+
 
 /**
  * Mengambil URL avatar profil pengguna dengan verifikasi keberadaan file di disk.

@@ -42,7 +42,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $action = $_POST['action'] ?? '';
 
     if ($action === 'profile') {
-        if (!isset($_FILES['profile_photo']) || $_FILES['profile_photo']['error'] !== UPLOAD_ERR_OK) {
+        $croppedData = $_POST['cropped_image'] ?? '';
+        if (!empty($croppedData) && preg_match('#^data:image/(jpeg|png|webp);base64,(.+)$#i', $croppedData, $matches)) {
+            $imageExt = strtolower($matches[1]);
+            if ($imageExt === 'jpeg') $imageExt = 'jpg';
+            $binaryData = base64_decode($matches[2]);
+
+            if ($binaryData === false || strlen($binaryData) > 5 * 1024 * 1024) {
+                $errorMessage = 'Ukuran foto maksimal 5 MB atau format tidak valid.';
+            } else {
+                $profileDir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR . 'profiles';
+                if (!is_dir($profileDir)) {
+                    mkdir($profileDir, 0755, true);
+                }
+
+                $fileName = 'user_' . $userId . '_' . time() . '.' . $imageExt;
+                $targetPath = $profileDir . DIRECTORY_SEPARATOR . $fileName;
+                $relativePath = 'img/profiles/' . $fileName;
+
+                if (file_put_contents($targetPath, $binaryData)) {
+                    $updateStmt = $conn->prepare('UPDATE users SET profile_photo = ? WHERE id = ?');
+                    $updateStmt->bind_param('si', $relativePath, $userId);
+                    $updateStmt->execute();
+
+                    if (!empty($user['profile_photo']) && str_starts_with($user['profile_photo'], 'img/profiles/')) {
+                        $oldPath = dirname(__DIR__) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $user['profile_photo']);
+                        if (is_file($oldPath)) {
+                            unlink($oldPath);
+                        }
+                    }
+
+                    $successMessage = 'Foto profil berhasil diperbarui.';
+                    $user['profile_photo'] = $relativePath;
+                } else {
+                    $errorMessage = 'Foto profil gagal disimpan.';
+                }
+            }
+        } elseif (!isset($_FILES['profile_photo']) || $_FILES['profile_photo']['error'] !== UPLOAD_ERR_OK) {
             $errorMessage = 'Pilih foto profil terlebih dahulu.';
         } elseif ($_FILES['profile_photo']['size'] > 5 * 1024 * 1024) {
             $errorMessage = 'Ukuran foto maksimal 5 MB.';
@@ -289,12 +325,24 @@ $accountVer = file_exists(__DIR__ . '/../css/account.css') ? filemtime(__DIR__ .
           </a>
         <?php endif; ?>
 
-        <form method="post" enctype="multipart/form-data" class="profile-upload">
+        <form method="post" enctype="multipart/form-data" class="profile-upload profile-photo-form" id="profileUploadForm">
           <?= csrf_field() ?>
           <input type="hidden" name="action" value="profile">
+          <input type="hidden" name="cropped_image" id="croppedImageData" value="">
+          
           <label for="profile_photo" class="file-label">Pilih foto baru</label>
-          <input type="file" id="profile_photo" name="profile_photo" accept="image/jpeg,image/png,image/webp" required>
-          <button type="submit" class="account-button">Simpan Foto</button>
+          <div class="file-input-wrapper">
+            <input type="file" id="profile_photo" name="profile_photo" accept="image/jpeg,image/png,image/webp">
+          </div>
+
+          <div class="crop-preview-controls" id="cropPreviewControls" style="display: none;">
+            <span class="crop-status-badge"><ion-icon name="checkmark-circle"></ion-icon> Foto disesuaikan</span>
+            <button type="button" class="btn-adjust-again" id="btnAdjustAgain">
+              <ion-icon name="crop-outline"></ion-icon> Atur Ulang Ukuran
+            </button>
+          </div>
+
+          <button type="submit" class="account-button" id="btnSubmitProfile">Simpan Foto</button>
         </form>
 
         <div class="danger-zone">
@@ -309,7 +357,7 @@ $accountVer = file_exists(__DIR__ . '/../css/account.css') ? filemtime(__DIR__ .
             <input type="hidden" name="action" value="delete_account">
             <label for="delete_current_password">Password saat ini</label>
             <input type="password" id="delete_current_password" name="current_password" autocomplete="current-password" required>
-            <label for="delete_confirmation">Ketik HAPUS AKUN</label>
+            <label for="delete_confirmation">Ketik "<strong>HAPUS AKUN</strong>"</label>
             <input type="text" id="delete_confirmation" name="confirmation" placeholder="HAPUS AKUN" autocomplete="off" required>
             <button type="submit" class="account-button danger-button">Hapus Akun Permanen</button>
           </form>
@@ -353,9 +401,46 @@ $accountVer = file_exists(__DIR__ . '/../css/account.css') ? filemtime(__DIR__ .
 
   </main>
 
+  <!-- Modal Sesuaikan Ukuran Foto Profil -->
+  <div class="crop-modal-overlay" id="cropModalOverlay" aria-hidden="true" style="display: none;">
+    <div class="crop-modal-dialog crop-modal-horizontal">
+      <div class="crop-modal-header">
+        <div class="crop-modal-title">
+          <ion-icon name="scan-outline"></ion-icon>
+          <h3>Sesuaikan Ukuran Foto</h3>
+        </div>
+        <button type="button" class="crop-modal-close" id="cropModalCloseBtn" aria-label="Tutup">&times;</button>
+      </div>
+
+      <div class="crop-modal-body-centered">
+        <div class="crop-stage-container">
+          <div class="crop-stage" id="cropStage">
+            <canvas id="cropDisplayCanvas" width="500" height="500"></canvas>
+            <div class="crop-box" id="cropBox">
+              <div class="crop-box-grid"></div>
+              <div class="crop-handle crop-handle-nw" data-handle="nw"></div>
+              <div class="crop-handle crop-handle-ne" data-handle="ne"></div>
+              <div class="crop-handle crop-handle-sw" data-handle="sw"></div>
+              <div class="crop-handle crop-handle-se" data-handle="se"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="crop-modal-footer">
+        <button type="button" class="crop-btn-cancel" id="cropModalCancelBtn">Batal</button>
+        <button type="button" class="crop-btn-apply" id="cropModalApplyBtn">
+          <ion-icon name="checkmark-sharp" class="crop-check-icon"></ion-icon>
+          <span>Terapkan & Simpan Foto</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <footer class="main-footer">
     <p>&copy; 2026 HS15 - Komunitas Keliling Banjar. All rights reserved.</p>
   </footer>
   <script src="../js/nav.js?v=20260924_v2"></script>
+  <script src="../js/account.js?v=<?= file_exists(__DIR__ . '/../js/account.js') ? filemtime(__DIR__ . '/../js/account.js') : time() ?>"></script>
 </body>
 </html>

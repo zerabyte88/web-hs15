@@ -20,18 +20,21 @@ if (empty($file)) {
 // Cegah null-byte injection
 $file = str_replace(chr(0), '', $file);
 
-// Normalisasi direktori dasar gallery
-$galleryDir = realpath(__DIR__ . '/../gallery');
-if (!$galleryDir) {
+// Normalisasi direktori dasar media
+$mediaDir = realpath(__DIR__ . '/../media');
+if (!$mediaDir) {
+    $mediaDir = realpath(__DIR__ . '/../gallery');
+}
+if (!$mediaDir) {
     http_response_code(500);
-    exit('Direktori galeri tidak ditemukan di server.');
+    exit('Direktori media tidak ditemukan di server.');
 }
 
-// Pastikan file path valid dan berada di dalam folder gallery (Mencegah Directory Traversal)
+// Pastikan file path valid dan berada di dalam folder media (Mencegah Directory Traversal)
 $normalizedRel = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file);
-$targetPath = realpath($galleryDir . DIRECTORY_SEPARATOR . $normalizedRel);
+$targetPath = realpath($mediaDir . DIRECTORY_SEPARATOR . $normalizedRel);
 
-if (!$targetPath || !is_file($targetPath) || !str_starts_with($targetPath, $galleryDir)) {
+if (!$targetPath || !is_file($targetPath) || !str_starts_with($targetPath, $mediaDir)) {
     http_response_code(404);
     header('Content-Type: text/plain; charset=utf-8');
     exit('File media tidak ditemukan atau akses ditolak.');
