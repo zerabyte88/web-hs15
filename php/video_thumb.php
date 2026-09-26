@@ -91,8 +91,10 @@ $thumb = imagecreatetruecolor($thumbWidth, $thumbHeight);
 imagecopyresampled($thumb, $srcImage, 0, 0, 0, 0, $thumbWidth, $thumbHeight, $srcWidth, $srcHeight);
 $saved = imagejpeg($thumb, $posterPath, 80);
 
-imagedestroy($srcImage);
-imagedestroy($thumb);
+if (PHP_VERSION_ID < 80500 && function_exists('imagedestroy')) {
+    @imagedestroy($srcImage);
+    @imagedestroy($thumb);
+}
 
 if (!$saved) {
     http_response_code(500);

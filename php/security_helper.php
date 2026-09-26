@@ -477,8 +477,10 @@ function generate_photo_thumbnail(string $src, string $dest, int $thumbWidth = 4
         $saved = imagejpeg($tmp, $dest, 80);
     }
 
-    imagedestroy($image);
-    imagedestroy($tmp);
+    if (PHP_VERSION_ID < 80500 && function_exists('imagedestroy')) {
+        @imagedestroy($image);
+        @imagedestroy($tmp);
+    }
     return $saved;
 }
 
