@@ -144,13 +144,16 @@ nav ul a.nav-active {
 
 .admin-nav-link:hover {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(229, 9, 20, 0.16);
+  border-color: rgba(229, 9, 20, 0.45);
+  box-shadow: 0 0 10px rgba(229, 9, 20, 0.25);
 }
 
 .admin-nav-link.active {
   color: #ffffff;
-  background: rgba(229, 9, 20, 0.2);
-  border: 1px solid rgba(229, 9, 20, 0.35);
+  background: rgba(229, 9, 20, 0.24);
+  border: 1px solid rgba(229, 9, 20, 0.55);
+  box-shadow: 0 0 14px rgba(229, 9, 20, 0.35);
   font-weight: 600;
 }
 
@@ -169,9 +172,23 @@ nav ul a.nav-active {
   height: 36px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(229, 9, 20, 0.7);
-  box-shadow: 0 2px 8px rgba(229, 9, 20, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   flex-shrink: 0;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Avatar Border Berdasarkan Peran (Role) */
+.admin-header-avatar.avatar-role-admin,
+.mobile-dropdown-avatar.avatar-role-admin {
+  border-color: rgba(168, 85, 247, 0.85);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.45);
+}
+
+.admin-header-avatar.avatar-role-member,
+.mobile-dropdown-avatar.avatar-role-member {
+  border-color: rgba(59, 130, 246, 0.85);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.45);
 }
 
 .user-pill {
@@ -188,11 +205,56 @@ nav ul a.nav-active {
 }
 
 .user-role-badge {
-  font-size: 0.68rem;
-  color: #10b981;
-  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
+  margin-top: 3px;
+  text-transform: none;
+  background: rgba(168, 85, 247, 0.18);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: #c084fc;
+}
+
+.user-role-badge ion-icon {
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.user-role-badge.badge-role-admin {
+  background: rgba(168, 85, 247, 0.18);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: #c084fc;
+}
+
+.user-role-badge.badge-role-member {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: #60a5fa;
+}
+
+/* Nav Link Admin - Aksen Ungu */
+.admin-nav-link[href="admin.php"],
+a.mobile-dropdown-item[href="admin.php"] {
+  color: #c084fc !important;
+}
+
+.admin-nav-link[href="admin.php"]:hover {
+  background: rgba(168, 85, 247, 0.18) !important;
+  border-color: rgba(168, 85, 247, 0.5) !important;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.3) !important;
+  color: #ffffff !important;
+}
+
+.admin-nav-link[href="admin.php"].active {
+  background: rgba(168, 85, 247, 0.28) !important;
+  border-color: rgba(168, 85, 247, 0.6) !important;
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.4) !important;
+  color: #ffffff !important;
 }
 
 .btn-logout {
@@ -212,6 +274,33 @@ nav ul a.nav-active {
 .btn-logout:hover {
   background: #ef4444;
   color: #ffffff;
+}
+
+/* Tombol Log Out Berdasarkan Peran (Role) */
+.btn-logout.btn-logout-admin {
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  color: #c084fc;
+}
+
+.btn-logout.btn-logout-admin:hover {
+  background: #9333ea;
+  border-color: #a855f7;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.45);
+}
+
+.btn-logout.btn-logout-member {
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  color: #60a5fa;
+}
+
+.btn-logout.btn-logout-member:hover {
+  background: #2563eb;
+  border-color: #3b82f6;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.45);
 }
 
 /* Profile menu */
@@ -394,6 +483,7 @@ nav ul a.nav-active {
 .mobile-dropdown-info {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   min-width: 0;
 }
 
@@ -407,11 +497,37 @@ nav ul a.nav-active {
 }
 
 .mobile-dropdown-role {
-  font-size: 0.65rem;
-  color: #10b981;
-  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
+  margin-top: 3px;
+  text-transform: none;
+  background: rgba(168, 85, 247, 0.18);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: #c084fc;
+}
+
+.mobile-dropdown-role ion-icon {
+  font-size: 0.82rem;
+  flex-shrink: 0;
+}
+
+.mobile-dropdown-role.badge-role-admin {
+  background: rgba(168, 85, 247, 0.18);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: #c084fc;
+}
+
+.mobile-dropdown-role.badge-role-member {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: #60a5fa;
 }
 
 .mobile-dropdown-divider {
@@ -440,14 +556,14 @@ nav ul a.nav-active {
 
 .mobile-dropdown-item:hover {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(229, 9, 20, 0.14);
   padding-left: 14px;
 }
 
 .mobile-dropdown-item.active {
   color: #ffffff;
   background: rgba(229, 9, 20, 0.22);
-  border: 1px solid rgba(229, 9, 20, 0.35);
+  border: 1px solid rgba(229, 9, 20, 0.45);
   font-weight: 600;
 }
 
@@ -458,6 +574,24 @@ nav ul a.nav-active {
 .mobile-dropdown-item.mobile-logout:hover {
   color: #ffffff;
   background: rgba(239, 68, 68, 0.2);
+}
+
+.mobile-dropdown-item.mobile-logout.mobile-logout-admin {
+  color: #c084fc;
+}
+
+.mobile-dropdown-item.mobile-logout.mobile-logout-admin:hover {
+  color: #ffffff;
+  background: rgba(168, 85, 247, 0.22);
+}
+
+.mobile-dropdown-item.mobile-logout.mobile-logout-member {
+  color: #60a5fa;
+}
+
+.mobile-dropdown-item.mobile-logout.mobile-logout-member:hover {
+  color: #ffffff;
+  background: rgba(59, 130, 246, 0.22);
 }
 
 /* Responsive Breakpoints */

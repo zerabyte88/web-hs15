@@ -181,7 +181,7 @@ project_hs15/
    - `img/profiles/`
 
 7. **Buka Domain**:
-   Akses domain kamu di browser, buat akun pertama lewat menu Register, dan web langsung siap digunakan.
+   Akses domain kamu di browser untuk login. *(Jika belum ada akun sama sekali, kamu bisa akses langsung `php/register.php` sekali untuk mendaftarkan akun admin pertama).*
 
 ---
 

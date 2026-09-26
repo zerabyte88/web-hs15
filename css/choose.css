@@ -1,4 +1,4 @@
-/* choose.css - Minimalist Selection Cards (Mirip Gallery & Vidgallery) */
+/* choose.css - Desain Halaman Beranda / Menu HS15 */
 
 body.choose-page {
   display: flex;
@@ -9,8 +9,6 @@ body.choose-page {
   overflow-x: hidden;
 }
 
-
-
 .choose-main {
   flex: 1;
   display: flex;
@@ -18,18 +16,22 @@ body.choose-page {
   justify-content: center;
   align-items: center;
   width: 100%;
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 36px 24px 50px;
   box-sizing: border-box;
   position: relative;
   z-index: 10;
 }
 
+/* ==========================================================================
+   Hero & Kata Pengantar
+   ========================================================================== */
 .hero-section {
   text-align: center;
-  margin-bottom: 36px;
-  animation: heroFadeIn 0.4s ease;
+  margin-bottom: 28px;
+  max-width: 760px;
+  animation: heroFadeIn 0.4s ease-out;
 }
 
 @keyframes heroFadeIn {
@@ -43,165 +45,223 @@ body.choose-page {
   }
 }
 
-.hero-section h1 {
-  font-size: 2.2rem;
+/* Greeting chip */
+.welcome-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 30px;
+  background: rgba(18, 20, 26, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-size: 0.84rem;
+  color: rgba(255, 255, 255, 0.88);
+  margin-bottom: 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.chip-avatar-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+  flex-shrink: 0;
+}
+
+.chip-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.72rem;
   font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.chip-role-admin {
+  background: rgba(168, 85, 247, 0.18);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: #c084fc;
+}
+
+.chip-role-member {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: #60a5fa;
+}
+
+.hero-section h1 {
+  font-size: 2.3rem;
+  font-weight: 800;
   color: #ffffff;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   letter-spacing: -0.02em;
+  line-height: 1.25;
 }
 
-.hero-section p {
-  font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.7);
-  max-width: 580px;
+.hero-intro {
+  font-size: 0.96rem;
+  color: rgba(255, 255, 255, 0.72);
   margin: 0 auto;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
-/* Container Statistik Galeri */
+.admin-notice-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  background: rgba(18, 20, 26, 0.85);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.4;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.admin-notice-pill ion-icon {
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  color: #c084fc;
+}
+
+/* ==========================================================================
+   Statistik Singkat (Photos & Videos)
+   ========================================================================== */
 .stats-container {
   display: flex;
-  gap: 16px;
+  gap: 14px;
   justify-content: center;
   align-items: center;
   width: 100%;
-  max-width: 520px;
-  margin: 0 auto 36px auto;
+  max-width: 440px;
+  margin: 0 auto 32px auto;
   box-sizing: border-box;
 }
 
 .stat-card {
   flex: 1 1 0;
-  background: rgba(18, 20, 26, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(18, 20, 26, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 14px;
-  padding: 14px 18px;
+  padding: 12px 18px;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 14px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  gap: 12px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
   transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
   box-sizing: border-box;
 }
 
 .stat-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(229, 9, 20, 0.5);
-  box-shadow: 0 8px 24px rgba(229, 9, 20, 0.25);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
 }
 
 .stat-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: rgba(229, 9, 20, 0.15);
-  border: 1px solid rgba(229, 9, 20, 0.35);
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-.stat-icon ion-icon {
-  font-size: 1.5rem;
-  color: #ff3b47;
+.stat-icon-photo {
+  background: rgba(229, 9, 20, 0.15);
+  border: 1px solid rgba(229, 9, 20, 0.35);
+  color: #ff4757;
+}
+
+.stat-icon-photo ion-icon {
+  font-size: 1.35rem;
+  color: #ff4757;
+}
+
+.stat-icon-video {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  color: #60a5fa;
+}
+
+.stat-icon-video ion-icon {
+  font-size: 1.35rem;
+  color: #60a5fa;
 }
 
 .stat-info {
-  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding-right: 18px;
-  min-width: 0;
-}
-
-.stat-number {
-  font-size: 1.65rem;
-  font-weight: 700;
-  color: #ffffff;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
-  text-align: center;
-  margin-top: 2px;
+  align-items: flex-start;
 }
 
 .stat-label {
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.6);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 2px;
-  text-align: center;
 }
 
-@media (max-width: 600px) {
-  .stats-container {
-    max-width: 100%;
-    gap: 10px;
-    margin-bottom: 28px;
-  }
-  .stat-card {
-    padding: 12px 12px;
-    gap: 10px;
-    border-radius: 12px;
-    justify-content: flex-start;
-  }
-  .stat-icon {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-  }
-  .stat-icon ion-icon {
-    font-size: 1.25rem;
-  }
-  .stat-info {
-    flex: 1;
-    align-items: center;
-    text-align: center;
-    padding-right: 8px;
-  }
-  .stat-number {
-    font-size: 1.35rem;
-    text-align: center;
-    margin-top: 2px;
-  }
-  .stat-label {
-    font-size: 0.68rem;
-    text-align: center;
-    margin-bottom: 2px;
-  }
+.stat-number {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
 }
 
+/* ==========================================================================
+   Menu Kartu Pilihan (Grid Sistem)
+   ========================================================================== */
 .menu {
-  display: flex;
-  gap: 28px;
-  justify-content: center;
-  align-items: stretch;
-  flex-wrap: wrap;
   width: 100%;
+  margin: 0 auto;
 }
 
+/* Tampilan Admin: 3 Kolom Sejajar di Desktop */
+.menu-admin {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  max-width: 1140px;
+}
+
+/* Tampilan Member: 2 Kolom Sejajar Rapi di Desktop */
+.menu-member {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  max-width: 820px;
+}
+
+/* ==========================================================================
+   Desain Kartu Interaktif
+   ========================================================================== */
 .card {
   position: relative;
-  flex: 1 1 320px;
-  max-width: 380px;
-  min-height: 320px;
-  background: rgba(18, 20, 26, 0.85);
+  background: rgba(18, 20, 26, 0.82);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+  border-radius: 18px;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   text-decoration: none;
   color: #ffffff;
@@ -209,22 +269,146 @@ body.choose-page {
               box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
               border-color 0.3s ease;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-  padding: 36px 24px;
+  padding: 30px 24px 28px;
   box-sizing: border-box;
 }
 
 .card:hover {
   transform: translateY(-6px);
-  border-color: rgba(229, 9, 20, 0.5);
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(229, 9, 20, 0.25);
 }
 
-.card .card-action ion-icon {
-  transition: transform 0.25s ease;
+/* Card Photo - Tema Merah */
+.card-photo .card-badge {
+  background: rgba(229, 9, 20, 0.15);
+  border: 1px solid rgba(229, 9, 20, 0.35);
+  color: #ff6b75;
 }
 
-.card:hover .card-action ion-icon {
-  transform: translateX(4px);
+.card-photo .icon {
+  background: rgba(229, 9, 20, 0.12);
+  border: 1px solid rgba(229, 9, 20, 0.3);
+  color: #ff4757;
+}
+
+.card-photo .icon ion-icon {
+  color: #ff4757;
+}
+
+.card-photo:hover {
+  border-color: rgba(229, 9, 20, 0.6);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(229, 9, 20, 0.3);
+}
+
+.card-photo:hover .icon {
+  background: linear-gradient(135deg, #e50914 0%, #b80710 100%);
+  border-color: #e50914;
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(229, 9, 20, 0.45);
+}
+
+.card-photo:hover .icon ion-icon {
+  color: #ffffff;
+}
+
+.card-photo:hover .card-action {
+  color: #ffffff;
+  background: linear-gradient(135deg, #e50914 0%, #b80710 100%);
+  border-color: #e50914;
+  box-shadow: 0 4px 14px rgba(229, 9, 20, 0.35);
+}
+
+/* Card Video - Tema Biru */
+.card-video .card-badge {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  color: #60a5fa;
+}
+
+.card-video .icon {
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
+}
+
+.card-video .icon ion-icon {
+  color: #60a5fa;
+}
+
+.card-video:hover {
+  border-color: rgba(59, 130, 246, 0.6);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(59, 130, 246, 0.3);
+}
+
+.card-video:hover .icon {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-color: #3b82f6;
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.45);
+}
+
+.card-video:hover .icon ion-icon {
+  color: #ffffff;
+}
+
+.card-video:hover .card-action {
+  color: #ffffff;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-color: #3b82f6;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+}
+
+/* Card Admin - Tema Aksen Ungu (Hanya badge, ikon, dan garis aksen) */
+.card-admin {
+  border-color: rgba(168, 85, 247, 0.25);
+}
+
+.card-admin .card-badge-admin {
+  background: rgba(168, 85, 247, 0.18);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: #c084fc;
+}
+
+.card-admin .icon-admin {
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  color: #c084fc;
+}
+
+.card-admin .icon-admin ion-icon {
+  color: #c084fc;
+}
+
+.card-admin:hover {
+  border-color: rgba(168, 85, 247, 0.55);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(168, 85, 247, 0.25);
+}
+
+.card-admin:hover .icon-admin {
+  background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%);
+  border-color: #a855f7;
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.45);
+}
+
+.card-admin:hover .icon-admin ion-icon {
+  color: #ffffff;
+}
+
+.card-admin:hover .card-action-admin {
+  color: #ffffff;
+  background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%);
+  border-color: #a855f7;
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35);
+}
+
+/* Badge di atas kartu */
+.card-badge {
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 18px;
+  letter-spacing: 0.02em;
 }
 
 .content {
@@ -236,33 +420,23 @@ body.choose-page {
 }
 
 .icon {
-  width: 72px;
-  height: 72px;
+  width: 66px;
+  height: 66px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .icon ion-icon {
-  font-size: 2.2rem;
-  color: #ffffff;
+  font-size: 2rem;
   transition: all 0.3s ease;
 }
 
-.card:hover .icon {
-  background: linear-gradient(135deg, #e50914 0%, #b80710 100%);
-  border-color: #e50914;
-  transform: scale(1.08);
-  box-shadow: 0 6px 20px rgba(229, 9, 20, 0.45);
-}
-
 .card h2 {
-  font-size: 1.5rem;
+  font-size: 1.45rem;
   font-weight: 700;
   margin-bottom: 8px;
   letter-spacing: -0.01em;
@@ -270,104 +444,169 @@ body.choose-page {
 }
 
 .card p {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.65);
-  line-height: 1.5;
+  line-height: 1.55;
   margin-bottom: 22px;
-  max-width: 280px;
+  max-width: 290px;
+  min-height: 52px;
 }
 
 .card-action {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 18px;
-  border-radius: 20px;
+  gap: 8px;
+  padding: 8px 20px;
+  border-radius: 22px;
   color: #ffffff;
-  font-size: 0.88rem;
-  font-weight: 500;
+  font-size: 0.86rem;
+  font-weight: 600;
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   transition: all 0.25s ease;
 }
 
-.card:hover .card-action {
-  background: linear-gradient(135deg, #e50914 0%, #b80710 100%);
-  border-color: #e50914;
-  box-shadow: 0 4px 14px rgba(229, 9, 20, 0.35);
-  transform: translateY(-1px);
+.card-action ion-icon {
+  font-size: 1.05rem;
+  transition: transform 0.25s ease;
 }
 
-/* Optimasi Khusus HP / Layar Mobile */
+.card:hover .card-action ion-icon {
+  transform: translateX(4px);
+}
+
+/* ==========================================================================
+   Responsif Layar (Tablet & Mobile)
+   ========================================================================== */
+@media (max-width: 960px) {
+  .menu-admin {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 780px;
+  }
+
+  .card-admin {
+    grid-column: 1 / -1;
+    max-width: 500px;
+    margin: 0 auto;
+    width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
   body.choose-page {
-    padding-top: 104px;
+    padding-top: 88px;
   }
 
   .choose-main {
-    padding: 30px 16px 40px;
+    padding: 24px 16px 40px;
     justify-content: flex-start;
   }
 
   .hero-section {
-    margin-bottom: 28px;
+    margin-bottom: 22px;
   }
 
   .hero-section h1 {
-    font-size: 1.7rem;
+    font-size: 1.8rem;
     line-height: 1.3;
   }
 
-  .hero-section p {
+  .hero-intro {
     font-size: 0.88rem;
+    line-height: 1.5;
   }
 
-  .menu {
+  .stats-container {
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    padding: 10px 14px;
+    gap: 10px;
+    border-radius: 12px;
+  }
+
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+  }
+
+  .stat-icon ion-icon {
+    font-size: 1.2rem;
+  }
+
+  .stat-number {
+    font-size: 1.3rem;
+  }
+
+  .stat-label {
+    font-size: 0.66rem;
+  }
+
+  .menu,
+  .menu-admin,
+  .menu-member {
+    display: flex;
     flex-direction: column;
     align-items: center;
     gap: 16px;
+    max-width: 440px;
+    width: 100%;
   }
 
-  .card {
+  .card,
+  .card-admin {
     width: 100%;
-    max-width: 420px;
+    max-width: 100%;
     min-height: auto;
-    padding: 30px 20px;
+    padding: 24px 20px;
+  }
+
+  .card-badge {
+    margin-bottom: 14px;
   }
 
   .icon {
-    width: 60px;
-    height: 60px;
+    width: 56px;
+    height: 56px;
     margin-bottom: 14px;
   }
 
   .icon ion-icon {
-    font-size: 1.9rem;
+    font-size: 1.75rem;
   }
 
   .card h2 {
-    font-size: 1.35rem;
+    font-size: 1.3rem;
     margin-bottom: 6px;
   }
 
   .card p {
-    font-size: 0.85rem;
-    margin-bottom: 16px;
+    font-size: 0.84rem;
+    min-height: auto;
+    margin-bottom: 18px;
   }
 
   .card-action {
-    font-size: 0.84rem;
-    padding: 7px 16px;
+    font-size: 0.82rem;
+    padding: 7px 18px;
   }
 }
 
 @media (max-width: 480px) {
   .hero-section h1 {
-    font-size: 1.5rem;
+    font-size: 1.55rem;
+  }
+
+  .welcome-chip {
+    font-size: 0.78rem;
+    padding: 5px 12px;
   }
 
   .card {
-    padding: 22px 18px;
+    padding: 20px 16px;
   }
 }

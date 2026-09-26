@@ -3,6 +3,10 @@
 require_once __DIR__ . '/connect.php';
 require_once __DIR__ . '/security_helper.php';
 
+// Tutup akses: alihkan siapapun yang mencoba membuka halaman ini kembali ke halaman login
+header("Location: index.php");
+exit;
+
 $token = trim($_GET['token'] ?? $_POST['token'] ?? '');
 $error_message = '';
 $is_token_valid = false;

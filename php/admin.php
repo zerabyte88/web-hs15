@@ -603,13 +603,16 @@ $usersList = $conn->query("
 
 $cssVer = file_exists(__DIR__ . '/../css/admin.css') ? filemtime(__DIR__ . '/../css/admin.css') : time();
 $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '/../css/global.css') : time();
+$bkgdVer = file_exists(__DIR__ . '/../css/background.css') ? filemtime(__DIR__ . '/../css/background.css') : time();
+$jsBkgdVer = file_exists(__DIR__ . '/../js/choose.js') ? filemtime(__DIR__ . '/../js/choose.js') : time();
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel - HS15</title>
+  <title>Panel Admin - HS15</title>
+  <link rel="stylesheet" href="../css/background.css?v=<?= $bkgdVer ?>">
   <link rel="stylesheet" href="../css/global.css?v=<?= $globalVer ?>">
   <link rel="stylesheet" href="../css/admin.css?v=<?= $cssVer ?>">
   <link rel="icon" href="../img/logo.jpg" type="image/jpeg">
@@ -617,6 +620,11 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </head>
 <body class="admin-body">
+
+  <!-- Latar Belakang Slideshow & Overlay -->
+  <div id="bkgd1"></div>
+  <div id="bkgd2"></div>
+  <div class="bkgd-overlay"></div>
 
   <!-- Header Navigasi Admin -->
   <header class="admin-header">
@@ -639,19 +647,22 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
         <a href="account.php" class="admin-nav-link nav-desktop-only" title="Pengaturan Akun">
           <ion-icon name="person-circle-outline"></ion-icon> <span>Akun</span>
         </a>
-        <a href="admin.php" class="admin-nav-link nav-desktop-only active" style="color:#ff3b47;" title="Panel Administrasi">
+        <a href="admin.php" class="admin-nav-link nav-desktop-only active" style="color:#c084fc;" title="Panel Administrasi">
           <ion-icon name="shield-checkmark-outline"></ion-icon> <span>Admin</span>
         </a>
       </div>
 
       <!-- Desktop User Profile -->
       <div class="admin-nav-user nav-desktop-only">
-        <img src="<?= htmlspecialchars(get_current_user_avatar($conn)) ?>" alt="Foto profil" class="admin-header-avatar" onerror="this.onerror=null; this.src='../img/logo.jpg';">
+        <img src="<?= htmlspecialchars(get_current_user_avatar($conn)) ?>" alt="Foto profil" class="admin-header-avatar avatar-role-admin" onerror="this.onerror=null; this.src='../img/logo.jpg';">
         <div class="user-pill">
           <span class="user-email"><?= htmlspecialchars($currentUserEmail) ?></span>
-          <span class="user-role-badge">Super Admin</span>
+          <span class="user-role-badge badge-role-admin">
+            <ion-icon name="shield-checkmark"></ion-icon>
+            Administrator
+          </span>
         </div>
-        <a href="logout.php" class="btn-logout" title="Log Out Sesi">
+        <a href="logout.php" class="btn-logout btn-logout-admin" title="Log Out Sesi">
           <ion-icon name="log-out-outline"></ion-icon>
         </a>
       </div>
@@ -663,21 +674,24 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
         </button>
         <div class="mobile-dropdown">
           <div class="mobile-dropdown-user">
-            <img src="<?= htmlspecialchars(get_current_user_avatar($conn)) ?>" alt="Foto profil" class="mobile-dropdown-avatar" onerror="this.onerror=null; this.src='../img/logo.jpg';">
+            <img src="<?= htmlspecialchars(get_current_user_avatar($conn)) ?>" alt="Foto profil" class="mobile-dropdown-avatar avatar-role-admin" onerror="this.onerror=null; this.src='../img/logo.jpg';">
             <div class="mobile-dropdown-info">
               <span class="mobile-dropdown-email"><?= htmlspecialchars($currentUserEmail) ?></span>
-              <span class="mobile-dropdown-role">Super Admin</span>
+              <span class="mobile-dropdown-role badge-role-admin">
+                <ion-icon name="shield-checkmark"></ion-icon>
+                Administrator
+              </span>
             </div>
           </div>
           <div class="mobile-dropdown-divider"></div>
           <a href="account.php" class="mobile-dropdown-item">
             <ion-icon name="person-circle-outline"></ion-icon> Setelan Akun
           </a>
-          <a href="admin.php" class="mobile-dropdown-item active" style="color:#ff3b47;">
+          <a href="admin.php" class="mobile-dropdown-item active" style="color:#c084fc;">
             <ion-icon name="shield-checkmark-outline"></ion-icon> Panel Admin
           </a>
           <div class="mobile-dropdown-divider"></div>
-          <a href="logout.php" class="mobile-dropdown-item mobile-logout">
+          <a href="logout.php" class="mobile-dropdown-item mobile-logout mobile-logout-admin">
             <ion-icon name="log-out-outline"></ion-icon> Log Out
           </a>
         </div>
@@ -688,7 +702,7 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
   <main class="admin-container">
     <!-- Judul Halaman -->
     <div class="admin-hero">
-      <h1>Panel Administrasi HS15</h1>
+      <h1>Panel Admin</h1>
       <p>Kelola koleksi foto, video, metadata, serta hak akses pengguna komunitas dengan mudah.</p>
     </div>
 
@@ -744,7 +758,7 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
           <ion-icon name="shield-checkmark-outline"></ion-icon>
         </div>
         <div class="stat-content">
-          <span class="stat-tit">Administrator</span>
+          <span class="stat-tit stat-tit-admin">Administrator</span>
           <span class="stat-val"><?= $stats['admins'] ?></span>
         </div>
       </div>
@@ -983,17 +997,24 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
               <?php endif; ?>
             </div>
 
-            <!-- Tombol Aksi Kanan Bawah: Pilih Semua, Hapus Semua -->
+            <!-- Tombol Aksi Kanan Bawah: Pilih Semua, Hapus -->
             <div class="table-footer-actions">
               <!-- Tombol Pilih Semua -->
-              <button type="button" class="btn btn-secondary btn-sm" id="btnToggleSelectAll" title="Pilih atau batalkan semua media di halaman ini">
+              <button type="button" class="btn btn-secondary btn-sm" id="btnToggleSelectAll" title="Pilih atau batalkan semua media di halaman ini" <?= empty($mediaList) ? 'disabled' : '' ?>>
                 <ion-icon name="checkbox-outline"></ion-icon> <span id="btnSelectAllText">Pilih Semua</span>
               </button>
 
-              <!-- Tombol Hapus Semua Media -->
-              <button type="button" class="btn btn-danger-outline btn-sm" id="btnOpenDeleteAll" onclick="openModal('modalDeleteAllMedia')" title="Hapus seluruh koleksi media secara permanen">
-                <ion-icon name="trash-bin-outline"></ion-icon> Hapus Semua
+              <!-- Tombol Hapus Media (Dinamis: Hapus / Hapus Dipilih / Hapus Semua) -->
+              <button type="button" class="btn btn-danger-outline btn-sm" id="btnOpenDeleteAll" onclick="handleDeleteAction()" title="Hapus media">
+                <ion-icon name="trash-bin-outline"></ion-icon> <span id="btnDeleteText">Hapus</span>
               </button>
+
+              <!-- Form Tersembunyi untuk Batch Delete -->
+              <form method="post" id="formDeleteSelected" style="display:none;">
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="delete_selected">
+                <input type="hidden" name="selected_ids" id="selectedIdsInput" value="">
+              </form>
             </div>
           </div>
 
@@ -1059,9 +1080,9 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
               </div>
 
               <!-- Pilihan Folder / Album -->
-              <select id="upload_folder" name="target_folder" class="form-control" style="background:#12141c; color:#ffffff;">
+              <select id="upload_folder" name="target_folder" class="form-control">
                 <option value="">(Root / Folder Utama Media)</option>
-                <option value="__new__" style="color:#60a5fa; font-weight:600;">➕ Buat Folder / Album Baru...</option>
+                <option value="__new__" style="color:#60a5fa; font-weight:600;">+ Buat Folder / Album Baru...</option>
                 <optgroup label="Folder / Album yang Tersedia:" id="existingFoldersGroup">
                   <?php 
                   $existingFolders = [];
@@ -1086,7 +1107,7 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
                   <div style="position: relative; flex: 1;">
                     <input type="text" id="new_folder_input" name="new_folder_name" class="form-control" placeholder="Nama folder baru (misal: S7 - Rapat Kerja)" autocomplete="off">
                   </div>
-                  <button type="button" class="btn btn-primary btn-sm" id="btnSaveNewFolderDirect" title="Buat folder sekarang di server">
+                  <button type="button" class="btn btn-blue btn-sm" id="btnSaveNewFolderDirect" title="Buat folder sekarang di server">
                     <ion-icon name="checkmark-outline"></ion-icon> Buat Folder
                   </button>
                   <button type="button" class="btn btn-secondary btn-sm" id="btnCancelNewFolder" title="Batal">
@@ -1106,7 +1127,7 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
           </div>
 
           <div style="margin-top: 24px; text-align: right;">
-            <button type="submit" class="btn btn-primary" id="btnSubmitUpload">
+            <button type="submit" class="btn btn-primary btn-success" id="btnSubmitUpload">
               <ion-icon name="arrow-up-circle-outline"></ion-icon> Unggah Media Sekarang
             </button>
           </div>
@@ -1121,7 +1142,7 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
       <div class="admin-card-box">
         <div class="box-header">
           <h2><ion-icon name="people-outline"></ion-icon> Daftar Akun & Hak Akses Pengguna</h2>
-          <button type="button" class="btn btn-primary btn-sm" id="btnOpenAddUser">
+          <button type="button" class="btn btn-primary btn-success btn-sm" id="btnOpenAddUser">
             <ion-icon name="person-add-outline"></ion-icon> Tambah Akun Pengguna
           </button>
         </div>
@@ -1558,8 +1579,11 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
           if (newFolderStatus) {
             newFolderStatus.style.display = 'none';
           }
-          if (uploadFolderSelect && uploadFolderSelect.value === '__new__') {
-            uploadFolderSelect.value = '';
+          if (uploadFolderSelect) {
+            if (uploadFolderSelect.value === '__new__') {
+              uploadFolderSelect.value = '';
+            }
+            uploadFolderSelect.style.color = '#ffffff';
           }
         }
       }
@@ -1577,7 +1601,10 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
       if (uploadFolderSelect) {
         uploadFolderSelect.addEventListener('change', () => {
           if (uploadFolderSelect.value === '__new__') {
+            uploadFolderSelect.style.color = '#60a5fa';
             showNewFolderField();
+          } else {
+            uploadFolderSelect.style.color = '#ffffff';
           }
         });
       }
@@ -1673,6 +1700,8 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
       // 2B. Batch Selection (Ceklis Media & Hapus Terpilih / Hapus Semua)
       // ====================================================================
       const btnToggleSelectAll = document.getElementById('btnToggleSelectAll');
+      const btnOpenDeleteAll = document.getElementById('btnOpenDeleteAll');
+      const btnDeleteText = document.getElementById('btnDeleteText');
       const btnDeleteSelected = document.getElementById('btnDeleteSelected');
       const deleteSelectedNum = document.getElementById('deleteSelectedNum');
       const selectedIdsInput = document.getElementById('selectedIdsInput');
@@ -1689,6 +1718,20 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
 
         if (btnDeleteSelected) {
           btnDeleteSelected.disabled = (count === 0);
+        }
+
+        // Teks tombol hapus dinamis:
+        // - 0 dicentang: "Hapus"
+        // - Semua media di halaman dicentang: "Hapus Semua"
+        // - Sebagian dicentang (misal 10 dari 15): "Hapus Dipilih"
+        if (btnDeleteText) {
+          if (count === 0) {
+            btnDeleteText.textContent = 'Hapus';
+          } else if (count === totalVisible && totalVisible > 0) {
+            btnDeleteText.textContent = 'Hapus Semua';
+          } else {
+            btnDeleteText.textContent = 'Hapus Dipilih';
+          }
         }
 
         const btnSelectAllText = document.getElementById('btnSelectAllText');
@@ -1724,20 +1767,41 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
         cb.addEventListener('change', updateBatchSelectionState);
       });
 
+      // Inisialisasi status batch saat pertama dimuat
+      updateBatchSelectionState();
+
       // Window global functions for inline onclick handlers
-      window.handleDeleteSelected = function() {
+      window.handleDeleteAction = function() {
         const checkedList = Array.from(document.querySelectorAll('.media-select-cb:checked'));
-        if (checkedList.length === 0) return;
         const count = checkedList.length;
-        if (!confirm(`Apakah Anda yakin ingin menghapus ${count} media terpilih secara permanen? File fisik dan thumbnail terkait akan dihapus dari server.`)) {
+        const totalVisible = mediaCheckboxes.length;
+
+        if (count === 0) {
+          alert('Silakan pilih atau centang media yang ingin dihapus terlebih dahulu.');
           return;
         }
-        const ids = checkedList.map(cb => cb.value);
-        if (selectedIdsInput) {
-          selectedIdsInput.value = ids.join(',');
+
+        let confirmMsg = '';
+        if (count === totalVisible && totalVisible > 0) {
+          confirmMsg = `Apakah Anda yakin ingin menghapus SEMUA media di halaman ini (${count} media) secara permanen?\n\nFile fisik dan thumbnail terkait akan dihapus dari server.`;
+        } else {
+          confirmMsg = `Apakah Anda yakin ingin menghapus ${count} media terpilih secara permanen?\n\nFile fisik dan thumbnail terkait akan dihapus dari server.`;
         }
-        document.getElementById('formDeleteSelected').submit();
+
+        if (!confirm(confirmMsg)) {
+          return;
+        }
+
+        const ids = checkedList.map(cb => cb.value);
+        const inputIds = document.getElementById('selectedIdsInput');
+        const formDelete = document.getElementById('formDeleteSelected');
+        if (inputIds && formDelete) {
+          inputIds.value = ids.join(',');
+          formDelete.submit();
+        }
       };
+
+      window.handleDeleteSelected = window.handleDeleteAction;
 
       window.validateDeleteAllConfirm = function(val) {
         const btn = document.getElementById('btnSubmitDeleteAll');
@@ -1875,6 +1939,7 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
       });
     });
   </script>
+  <script src="../js/choose.js?v=<?= $jsBkgdVer ?>"></script>
   <script src="../js/nav.js?v=<?= file_exists(__DIR__ . '/../js/nav.js') ? filemtime(__DIR__ . '/../js/nav.js') : time() ?>"></script>
 </body>
 </html>

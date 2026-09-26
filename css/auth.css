@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
 * {
   margin: 0;
@@ -186,7 +186,7 @@ section.auth-container {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 14px rgba(229, 9, 20, 0.35);
   margin-top: 8px;
-  margin-bottom: 22px;
+  margin-bottom: 0;
 }
 
 .btn-submit:hover {
@@ -244,6 +244,7 @@ section.auth-container {
 
 /* Footer & Navigasi Antar Form */
 .auth-footer {
+  margin-top: 22px;
   display: flex;
   flex-direction: column;
   gap: 8px;

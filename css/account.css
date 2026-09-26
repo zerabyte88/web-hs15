@@ -1,3 +1,7 @@
+body.account-body {
+  background: transparent;
+}
+
 .account-page {
   width: min(1100px, calc(100% - 40px));
   margin: 0 auto;
@@ -79,6 +83,19 @@
   border-radius: 50%;
   object-fit: cover;
   box-shadow: 0 5px 22px rgba(229, 9, 20, 0.25);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.profile-preview.preview-role-admin img,
+.profile-preview img.avatar-role-admin {
+  border-color: rgba(168, 85, 247, 0.85);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.45);
+}
+
+.profile-preview.preview-role-member img,
+.profile-preview img.avatar-role-member {
+  border-color: rgba(59, 130, 246, 0.85);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.45);
 }
 
 .status-dot {
@@ -101,20 +118,62 @@
 }
 
 .role-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border: 1px solid rgba(229, 9, 20, 0.35);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border: 1px solid rgba(229, 9, 20, 0.4);
   border-radius: 999px;
-  color: #ff7380;
-  background: rgba(229, 9, 20, 0.12);
-  font-size: 0.78rem;
-  font-weight: 600;
+  color: #ff4d58;
+  background: rgba(229, 9, 20, 0.2);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.role-badge ion-icon {
+  font-size: 0.86rem;
+  flex-shrink: 0;
+}
+
+.role-badge.role-admin {
+  background: rgba(168, 85, 247, 0.18);
+  border-color: rgba(168, 85, 247, 0.4);
+  color: #c084fc;
+}
+
+.role-badge.role-member {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #60a5fa;
 }
 
 .member-since {
   margin: 14px 0 22px;
   color: rgba(255, 255, 255, 0.55);
   font-size: 0.8rem;
+}
+
+/* Tombol Akses Cepat Panel Admin */
+.admin-shortcut-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  background: linear-gradient(135deg, #9333ea, #7e22ce) !important;
+  border: 1px solid #a855f7 !important;
+  color: #ffffff !important;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35) !important;
+  transition: all 0.2s ease;
+}
+
+.admin-shortcut-btn:hover {
+  background: linear-gradient(135deg, #a855f7, #9333ea) !important;
+  border-color: #c084fc !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(168, 85, 247, 0.5) !important;
+  color: #ffffff !important;
 }
 
 .profile-upload {
@@ -161,6 +220,19 @@
   cursor: pointer;
 }
 
+.profile-photo-form input[type="file"]::-webkit-file-upload-button {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 6px 14px;
+  margin-right: 8px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
 .profile-photo-form input[type="file"]::file-selector-button {
   background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
@@ -174,10 +246,16 @@
   transition: all 0.2s ease;
 }
 
+.profile-photo-form input[type="file"]::-webkit-file-upload-button:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
 .profile-photo-form input[type="file"]::file-selector-button:hover {
-  background: rgba(229, 9, 20, 0.25);
-  border-color: rgba(229, 9, 20, 0.8);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+  border-color: #ffffff;
+  color: #ffffff;
 }
 
 .profile-photo-form .account-button {
@@ -291,14 +369,14 @@
 .account-button {
   justify-self: start;
   padding: 10px 16px;
-  border: 1px solid rgba(229, 9, 20, 0.75);
+  border: 1px solid #10b981;
   border-radius: 7px;
   color: #ffffff;
-  background: linear-gradient(135deg, #e50914, #b80710);
+  background: linear-gradient(135deg, #10b981, #059669);
   cursor: pointer;
   font-size: 0.82rem;
   font-weight: 600;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .profile-upload:not(.delete-account-form) .account-button {
@@ -307,7 +385,8 @@
 
 .account-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(229, 9, 20, 0.3);
+  background: linear-gradient(135deg, #34d399, #059669);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
 }
 
 .danger-zone {
@@ -369,13 +448,17 @@
 }
 
 .danger-button {
-  background: transparent;
-  color: #ff8791;
+  background: transparent !important;
+  color: #ff8791 !important;
+  border: 1px solid rgba(239, 68, 68, 0.45) !important;
+  box-shadow: none !important;
 }
 
 .danger-button:hover {
-  color: #ffffff;
-  background: #b80710;
+  color: #ffffff !important;
+  background: #dc2626 !important;
+  border-color: #ef4444 !important;
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35) !important;
 }
 
 /* Modal Crop & Customizer */

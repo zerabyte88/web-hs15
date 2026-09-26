@@ -1,4 +1,4 @@
-﻿#bkgd1, #bkgd2 {
+#bkgd1, #bkgd2 {
   position: fixed;
   top: 0;
   left: 0;
@@ -19,15 +19,16 @@
   opacity: 0;
 }
 
-/* Overlay halus agar teks dan form selalu terbaca jelas */
+/* Overlay halus agar teks dan form selalu terbaca jelas; blur dikurangi agar suasana kegiatan komunitas lebih terlihat */
 .bkgd-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100vh;
-  background: radial-gradient(circle at center, rgba(10, 12, 16, 0.45) 0%, rgba(5, 6, 8, 0.75) 100%);
-  backdrop-filter: blur(2px);
+  background: radial-gradient(circle at center, rgba(10, 12, 16, 0.48) 0%, rgba(5, 6, 8, 0.82) 100%);
+  backdrop-filter: blur(0.5px);
+  -webkit-backdrop-filter: blur(0.5px);
   z-index: -1;
   pointer-events: none;
 }

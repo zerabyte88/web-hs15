@@ -67,7 +67,7 @@ if (isset($_GET['deleted']) && $_GET['deleted'] == 1) {
       <div class="auth-header">
         <img src="../img/logo.jpg" alt="HS15 Logo" class="auth-logo">
         <h2>Selamat Datang</h2>
-        <p class="auth-subtitle">Masukkan email dan password untuk melanjutkan ke HS15</p>
+        <p class="auth-subtitle">Masukkan email dan password untuk lanjut</p>
       </div>
 
       <?php if (!empty($error_message)): ?>
@@ -109,12 +109,6 @@ if (isset($_GET['deleted']) && $_GET['deleted'] == 1) {
           <span>Masuk</span>
           <ion-icon name="arrow-forward-outline"></ion-icon>
         </button>
-
-        <div class="auth-footer">
-          <p>Belum punya akun? <a href="../php/register.php">Daftar sekarang</a></p>
-          <div class="auth-divider"></div>
-          <p><a href="../php/fgpass.php">Lupa password Anda?</a></p>
-        </div>
       </form>
     </div>
   </section>

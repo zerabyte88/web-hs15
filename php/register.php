@@ -2,6 +2,16 @@
 require_once __DIR__ . '/connect.php';
 require_once __DIR__ . '/security_helper.php';
 
+// Proteksi: Tutup akses pendaftaran akun dari publik atau pengguna luar
+// Hanya boleh diakses oleh Admin yang login, atau jika database masih kosong (inisialisasi awal)
+$userCheck = @$conn->query("SELECT id FROM users LIMIT 1");
+$hasUsers = ($userCheck && $userCheck->num_rows > 0);
+
+if ($hasUsers && (!isset($_SESSION['user_id']) || !is_admin($conn))) {
+    header("Location: index.php");
+    exit;
+}
+
 $error_message = '';
 $email_val = '';
 

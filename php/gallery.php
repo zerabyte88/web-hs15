@@ -12,7 +12,7 @@ if (!isset($_SESSION['user_id'])) {
 $currentUserEmail = $_SESSION['email'] ?? 'User';
 $currentUserRole  = $_SESSION['role'] ?? 'member';
 $isSuperAdmin     = ($currentUserRole === 'admin');
-$roleBadgeText    = $isSuperAdmin ? 'Super Admin' : 'Member';
+$roleBadgeText    = $isSuperAdmin ? 'Administrator' : 'Member';
 
 sync_media_files_to_db($conn);
 $dir = get_media_base_dir();
@@ -105,7 +105,7 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
           <ion-icon name="person-circle-outline"></ion-icon> <span>Akun</span>
         </a>
         <?php if ($isSuperAdmin): ?>
-          <a href="admin.php" class="admin-nav-link nav-desktop-only" style="color:#ff3b47;" title="Panel Administrasi">
+          <a href="admin.php" class="admin-nav-link nav-desktop-only" style="color:#c084fc;" title="Panel Administrasi">
             <ion-icon name="shield-checkmark-outline"></ion-icon> <span>Admin</span>
           </a>
         <?php endif; ?>
@@ -113,12 +113,15 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
 
       <!-- Desktop User Profile -->
       <div class="admin-nav-user nav-desktop-only">
-        <img src="<?= htmlspecialchars(get_current_user_avatar($conn)) ?>" alt="Foto profil" class="admin-header-avatar" onerror="this.onerror=null; this.src='../img/logo.jpg';">
+        <img src="<?= htmlspecialchars(get_current_user_avatar($conn)) ?>" alt="Foto profil" class="admin-header-avatar <?= $isSuperAdmin ? 'avatar-role-admin' : 'avatar-role-member' ?>" onerror="this.onerror=null; this.src='../img/logo.jpg';">
         <div class="user-pill">
           <span class="user-email"><?= htmlspecialchars($currentUserEmail) ?></span>
-          <span class="user-role-badge" style="<?= !$isSuperAdmin ? 'color: #60a5fa;' : '' ?>"><?= $roleBadgeText ?></span>
+          <span class="user-role-badge <?= $isSuperAdmin ? 'badge-role-admin' : 'badge-role-member' ?>">
+            <ion-icon name="<?= $isSuperAdmin ? 'shield-checkmark' : 'person' ?>"></ion-icon>
+            <?= $roleBadgeText ?>
+          </span>
         </div>
-        <a href="logout.php" class="btn-logout" title="Log Out Sesi">
+        <a href="logout.php" class="btn-logout <?= $isSuperAdmin ? 'btn-logout-admin' : 'btn-logout-member' ?>" title="Log Out Sesi">
           <ion-icon name="log-out-outline"></ion-icon>
         </a>
       </div>
@@ -130,10 +133,13 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
         </button>
         <div class="mobile-dropdown">
           <div class="mobile-dropdown-user">
-            <img src="<?= htmlspecialchars(get_current_user_avatar($conn)) ?>" alt="Foto profil" class="mobile-dropdown-avatar" onerror="this.onerror=null; this.src='../img/logo.jpg';">
+            <img src="<?= htmlspecialchars(get_current_user_avatar($conn)) ?>" alt="Foto profil" class="mobile-dropdown-avatar <?= $isSuperAdmin ? 'avatar-role-admin' : 'avatar-role-member' ?>" onerror="this.onerror=null; this.src='../img/logo.jpg';">
             <div class="mobile-dropdown-info">
               <span class="mobile-dropdown-email"><?= htmlspecialchars($currentUserEmail) ?></span>
-              <span class="mobile-dropdown-role" style="<?= !$isSuperAdmin ? 'color: #60a5fa;' : '' ?>"><?= $roleBadgeText ?></span>
+              <span class="mobile-dropdown-role <?= $isSuperAdmin ? 'badge-role-admin' : 'badge-role-member' ?>">
+                <ion-icon name="<?= $isSuperAdmin ? 'shield-checkmark' : 'person' ?>"></ion-icon>
+                <?= $roleBadgeText ?>
+              </span>
             </div>
           </div>
           <div class="mobile-dropdown-divider"></div>
@@ -141,12 +147,12 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
             <ion-icon name="person-circle-outline"></ion-icon> Setelan Akun
           </a>
           <?php if ($isSuperAdmin): ?>
-            <a href="admin.php" class="mobile-dropdown-item" style="color:#ff3b47;">
+            <a href="admin.php" class="mobile-dropdown-item" style="color:#c084fc;">
               <ion-icon name="shield-checkmark-outline"></ion-icon> Panel Admin
             </a>
           <?php endif; ?>
           <div class="mobile-dropdown-divider"></div>
-          <a href="logout.php" class="mobile-dropdown-item mobile-logout">
+          <a href="logout.php" class="mobile-dropdown-item mobile-logout <?= $isSuperAdmin ? 'mobile-logout-admin' : 'mobile-logout-member' ?>">
             <ion-icon name="log-out-outline"></ion-icon> Log Out
           </a>
         </div>
@@ -203,27 +209,46 @@ $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '
       <?php endif; ?>
     </div>
 
-    <!-- Pagination Modern -->
-    <?php if ($pages > 0): ?>
-    <div class="pagination">
-      <?php if ($page > 1): ?>
-        <a href="?page=1" class="page-btn page-edge" title="Halaman Pertama">&laquo; Pertama</a>
-        <a href="?page=<?= $page - 1 ?>" class="page-btn" title="Halaman Sebelumnya">&lsaquo; Sebelumnya</a>
-      <?php else: ?>
-        <span class="page-btn page-edge is-disabled" aria-disabled="true">&laquo; Pertama</span>
-        <span class="page-btn is-disabled" aria-disabled="true">&lsaquo; Sebelumnya</span>
-      <?php endif; ?>
-      
-      <span class="page-info">Halaman <?= $page ?> dari <?= $pages ?></span>
-      
-      <?php if ($page < $pages): ?>
-        <a href="?page=<?= $page + 1 ?>" class="page-btn" title="Halaman Selanjutnya">Selanjutnya &rsaquo;</a>
-        <a href="?page=<?= $pages ?>" class="page-btn page-edge" title="Halaman Terakhir">Akhir &raquo;</a>
-      <?php else: ?>
-        <span class="page-btn is-disabled" aria-disabled="true">Selanjutnya &rsaquo;</span>
-        <span class="page-btn page-edge is-disabled" aria-disabled="true">Akhir &raquo;</span>
-      <?php endif; ?>
+    <!-- Pagination Modern (Sama seperti Panel Admin) -->
+    <?php if ($pages > 1): ?>
+    <div class="gallery-pagination-wrap">
+      <div class="pagination-links">
+        <!-- Tombol Halaman Pertama (<<) & Sebelumnya (<) -->
+        <?php if ($page > 1): ?>
+          <a href="?page=1" class="page-num" title="Halaman Pertama">&laquo;</a>
+          <a href="?page=<?= $page - 1 ?>" class="page-num" title="Halaman Sebelumnya">&lsaquo;</a>
+        <?php else: ?>
+          <span class="page-num is-disabled" title="Halaman Pertama">&laquo;</span>
+          <span class="page-num is-disabled" title="Halaman Sebelumnya">&lsaquo;</span>
+        <?php endif; ?>
+
+        <!-- Nomor Halaman -->
+        <?php 
+          $startP = max(1, $page - 2);
+          $endP   = min($pages, $page + 2);
+          for ($p = $startP; $p <= $endP; $p++): 
+        ?>
+          <a href="?page=<?= $p ?>" class="page-num <?= $p === $page ? 'active' : '' ?>">
+            <?= $p ?>
+          </a>
+        <?php endfor; ?>
+
+        <!-- Tombol Halaman Berikutnya (>) & Terakhir (>>) -->
+        <?php if ($page < $pages): ?>
+          <a href="?page=<?= $page + 1 ?>" class="page-num" title="Halaman Selanjutnya">&rsaquo;</a>
+          <a href="?page=<?= $pages ?>" class="page-num" title="Halaman Terakhir">&raquo;</a>
+        <?php else: ?>
+          <span class="page-num is-disabled" title="Halaman Selanjutnya">&rsaquo;</span>
+          <span class="page-num is-disabled" title="Halaman Terakhir">&raquo;</span>
+        <?php endif; ?>
+      </div>
+
+      <div class="pagination-info">Menampilkan halaman <?= $page ?> dari <?= $pages ?> (Total <?= $total ?> foto)</div>
     </div>
+    <?php elseif ($total > 0): ?>
+      <div class="gallery-pagination-wrap">
+        <div class="pagination-info">Menampilkan seluruh <?= $total ?> foto</div>
+      </div>
     <?php endif; ?>
   </main>
 

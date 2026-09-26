@@ -206,10 +206,12 @@ $createdDate = date('d F Y', strtotime($user['created_at']));
 $currentUserEmail = $user['email'] ?? ($_SESSION['email'] ?? 'User');
 $currentUserRole  = $user['role'] ?? ($_SESSION['role'] ?? 'member');
 $isSuperAdmin     = ($currentUserRole === 'admin');
-$roleBadgeText    = $isSuperAdmin ? 'Super Admin' : 'Member';
+$roleBadgeText    = $isSuperAdmin ? 'Administrator' : 'Member';
 
 $globalVer = file_exists(__DIR__ . '/../css/global.css') ? filemtime(__DIR__ . '/../css/global.css') : time();
 $accountVer = file_exists(__DIR__ . '/../css/account.css') ? filemtime(__DIR__ . '/../css/account.css') : time();
+$bkgdVer = file_exists(__DIR__ . '/../css/background.css') ? filemtime(__DIR__ . '/../css/background.css') : time();
+$jsBkgdVer = file_exists(__DIR__ . '/../js/choose.js') ? filemtime(__DIR__ . '/../js/choose.js') : time();
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -217,13 +219,20 @@ $accountVer = file_exists(__DIR__ . '/../css/account.css') ? filemtime(__DIR__ .
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Setelan Akun - HS15</title>
+  <link rel="stylesheet" href="../css/background.css?v=<?= $bkgdVer ?>">
   <link rel="stylesheet" href="../css/global.css?v=<?= $globalVer ?>">
   <link rel="stylesheet" href="../css/account.css?v=<?= $accountVer ?>">
   <link rel="icon" href="../img/logo.jpg" type="image/jpeg">
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </head>
-<body>
+<body class="account-body">
+
+  <!-- Latar Belakang Slideshow & Overlay -->
+  <div id="bkgd1"></div>
+  <div id="bkgd2"></div>
+  <div class="bkgd-overlay"></div>
+
   <!-- Header Navigasi -->
   <header>
     <nav>
@@ -246,7 +255,7 @@ $accountVer = file_exists(__DIR__ . '/../css/account.css') ? filemtime(__DIR__ .
           <ion-icon name="person-circle-outline"></ion-icon> <span>Akun</span>
         </a>
         <?php if ($isSuperAdmin): ?>
-          <a href="admin.php" class="admin-nav-link nav-desktop-only" style="color:#ff3b47;" title="Panel Administrasi">
+          <a href="admin.php" class="admin-nav-link nav-desktop-only" style="color:#c084fc;" title="Panel Administrasi">
             <ion-icon name="shield-checkmark-outline"></ion-icon> <span>Admin</span>
           </a>
         <?php endif; ?>
@@ -254,12 +263,15 @@ $accountVer = file_exists(__DIR__ . '/../css/account.css') ? filemtime(__DIR__ .
 
       <!-- Desktop User Profile -->
       <div class="admin-nav-user nav-desktop-only">
-        <img src="<?= htmlspecialchars(get_current_user_avatar($conn)) ?>" alt="Foto profil" class="admin-header-avatar" onerror="this.onerror=null; this.src='../img/logo.jpg';">
+        <img src="<?= htmlspecialchars(get_current_user_avatar($conn)) ?>" alt="Foto profil" class="admin-header-avatar <?= $isSuperAdmin ? 'avatar-role-admin' : 'avatar-role-member' ?>" onerror="this.onerror=null; this.src='../img/logo.jpg';">
         <div class="user-pill">
           <span class="user-email"><?= htmlspecialchars($currentUserEmail) ?></span>
-          <span class="user-role-badge" style="<?= !$isSuperAdmin ? 'color: #60a5fa;' : '' ?>"><?= $roleBadgeText ?></span>
+          <span class="user-role-badge <?= $isSuperAdmin ? 'badge-role-admin' : 'badge-role-member' ?>">
+            <ion-icon name="<?= $isSuperAdmin ? 'shield-checkmark' : 'person' ?>"></ion-icon>
+            <?= $roleBadgeText ?>
+          </span>
         </div>
-        <a href="logout.php" class="btn-logout" title="Log Out Sesi">
+        <a href="logout.php" class="btn-logout <?= $isSuperAdmin ? 'btn-logout-admin' : 'btn-logout-member' ?>" title="Log Out Sesi">
           <ion-icon name="log-out-outline"></ion-icon>
         </a>
       </div>
@@ -271,10 +283,13 @@ $accountVer = file_exists(__DIR__ . '/../css/account.css') ? filemtime(__DIR__ .
         </button>
         <div class="mobile-dropdown">
           <div class="mobile-dropdown-user">
-            <img src="<?= htmlspecialchars(get_current_user_avatar($conn)) ?>" alt="Foto profil" class="mobile-dropdown-avatar" onerror="this.onerror=null; this.src='../img/logo.jpg';">
+            <img src="<?= htmlspecialchars(get_current_user_avatar($conn)) ?>" alt="Foto profil" class="mobile-dropdown-avatar <?= $isSuperAdmin ? 'avatar-role-admin' : 'avatar-role-member' ?>" onerror="this.onerror=null; this.src='../img/logo.jpg';">
             <div class="mobile-dropdown-info">
               <span class="mobile-dropdown-email"><?= htmlspecialchars($currentUserEmail) ?></span>
-              <span class="mobile-dropdown-role" style="<?= !$isSuperAdmin ? 'color: #60a5fa;' : '' ?>"><?= $roleBadgeText ?></span>
+              <span class="mobile-dropdown-role <?= $isSuperAdmin ? 'badge-role-admin' : 'badge-role-member' ?>">
+                <ion-icon name="<?= $isSuperAdmin ? 'shield-checkmark' : 'person' ?>"></ion-icon>
+                <?= $roleBadgeText ?>
+              </span>
             </div>
           </div>
           <div class="mobile-dropdown-divider"></div>
@@ -282,12 +297,12 @@ $accountVer = file_exists(__DIR__ . '/../css/account.css') ? filemtime(__DIR__ .
             <ion-icon name="person-circle-outline"></ion-icon> Setelan Akun
           </a>
           <?php if ($isSuperAdmin): ?>
-            <a href="admin.php" class="mobile-dropdown-item" style="color:#ff3b47;">
+            <a href="admin.php" class="mobile-dropdown-item" style="color:#c084fc;">
               <ion-icon name="shield-checkmark-outline"></ion-icon> Panel Admin
             </a>
           <?php endif; ?>
           <div class="mobile-dropdown-divider"></div>
-          <a href="logout.php" class="mobile-dropdown-item mobile-logout">
+          <a href="logout.php" class="mobile-dropdown-item mobile-logout <?= $isSuperAdmin ? 'mobile-logout-admin' : 'mobile-logout-member' ?>">
             <ion-icon name="log-out-outline"></ion-icon> Log Out
           </a>
         </div>
@@ -311,16 +326,19 @@ $accountVer = file_exists(__DIR__ . '/../css/account.css') ? filemtime(__DIR__ .
 
     <section class="account-grid">
       <article class="account-card account-summary">
-        <div class="profile-preview">
-          <img src="<?= htmlspecialchars($profileImage) ?>" alt="Foto profil akun">
+        <div class="profile-preview <?= $isSuperAdmin ? 'preview-role-admin' : 'preview-role-member' ?>">
+          <img src="<?= htmlspecialchars($profileImage) ?>" alt="Foto profil akun" class="<?= $isSuperAdmin ? 'avatar-role-admin' : 'avatar-role-member' ?>">
           <span class="status-dot"></span>
         </div>
         <h2><?= htmlspecialchars($user['email']) ?></h2>
-        <span class="role-badge"><?= htmlspecialchars($roleLabel) ?></span>
+        <span class="role-badge <?= $user['role'] === 'admin' ? 'role-admin' : 'role-member' ?>">
+          <ion-icon name="<?= $user['role'] === 'admin' ? 'shield-checkmark' : 'person' ?>"></ion-icon>
+          <?= htmlspecialchars($roleLabel) ?>
+        </span>
         <p class="member-since">Bergabung sejak <?= htmlspecialchars($createdDate) ?></p>
 
         <?php if ($user['role'] === 'admin'): ?>
-          <a href="admin.php" class="account-button" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:8px; margin-bottom:14px; background:#e50914; color:#fff;">
+          <a href="admin.php" class="account-button admin-shortcut-btn" title="Buka Panel Administrasi HS15">
             <ion-icon name="shield-checkmark-outline"></ion-icon> Buka Panel Admin
           </a>
         <?php endif; ?>
@@ -440,6 +458,7 @@ $accountVer = file_exists(__DIR__ . '/../css/account.css') ? filemtime(__DIR__ .
   <footer class="main-footer">
     <p>&copy; 2026 HS15 - Komunitas Keliling Banjar. All rights reserved.</p>
   </footer>
+  <script src="../js/choose.js?v=<?= $jsBkgdVer ?>"></script>
   <script src="../js/nav.js?v=20260924_v2"></script>
   <script src="../js/account.js?v=<?= file_exists(__DIR__ . '/../js/account.js') ? filemtime(__DIR__ . '/../js/account.js') : time() ?>"></script>
 </body>

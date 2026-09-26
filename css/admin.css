@@ -24,11 +24,7 @@
 }
 
 body.admin-body {
-  background-color: var(--admin-bg);
-  background-image: 
-    radial-gradient(circle at 10% 20%, rgba(229, 9, 20, 0.07) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.04) 0%, transparent 40%);
-  background-attachment: fixed;
+  background-color: transparent;
   color: var(--admin-text-main);
   font-family: var(--admin-font);
   margin: 0;
@@ -168,9 +164,9 @@ body.admin-body {
 }
 
 .icon-admins {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.35);
 }
 
 .stat-content {
@@ -203,6 +199,12 @@ body.admin-body {
   text-align: center;
 }
 
+.stat-tit-admin,
+.admin-stat-card:has(.icon-admins) .stat-tit,
+.icon-admins ~ .stat-content .stat-tit {
+  color: #c084fc;
+}
+
 /* Tabs Navigation */
 .admin-tabs {
   display: flex;
@@ -232,19 +234,59 @@ body.admin-body {
   white-space: nowrap;
 }
 
+/* Hover & Active States untuk Tab Admin */
 .tab-btn:hover {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.08);
 }
 
+.tab-btn:hover ion-icon {
+  color: #ffffff;
+}
+
+/* Keadaan Tab Aktif */
 .tab-btn.active {
   color: #ffffff;
   border-bottom-color: var(--admin-primary);
-  background: rgba(229, 9, 20, 0.08);
+  background: rgba(229, 9, 20, 0.12);
+}
+
+.tab-btn[data-tab="media"].active,
+.tab-btn[data-tab="users"].active {
+  border-bottom-color: var(--admin-primary);
+  background: rgba(229, 9, 20, 0.12);
+  color: #ffffff;
+}
+
+.tab-btn[data-tab="media"].active ion-icon,
+.tab-btn[data-tab="users"].active ion-icon {
+  color: #ff4d58;
+}
+
+.tab-btn[data-tab="upload"].active {
+  border-bottom-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.12);
+  color: #ffffff;
+}
+
+.tab-btn[data-tab="upload"].active ion-icon {
+  color: #60a5fa;
+}
+
+.tab-btn[data-tab="media"].active:hover,
+.tab-btn[data-tab="users"].active:hover {
+  color: #ffffff;
+  background: rgba(229, 9, 20, 0.18);
+}
+
+.tab-btn[data-tab="upload"].active:hover {
+  color: #ffffff;
+  background: rgba(59, 130, 246, 0.18);
 }
 
 .tab-btn ion-icon {
   font-size: 1.2rem;
+  transition: color 0.2s ease;
 }
 
 /* Tab Panels */
@@ -321,7 +363,8 @@ body.admin-body {
 }
 
 .search-box input:focus {
-  border-color: var(--admin-primary);
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
 .search-box ion-icon {
@@ -346,7 +389,8 @@ body.admin-body {
 }
 
 .filter-select:focus {
-  border-color: var(--admin-primary);
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
 .filter-select-hidden {
@@ -386,14 +430,14 @@ body.admin-body {
 }
 
 .custom-select-trigger:hover {
-  border-color: rgba(229, 9, 20, 0.45);
-  background: rgba(18, 20, 26, 0.95);
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(22, 25, 34, 0.95);
 }
 
 .custom-select-box.open .custom-select-trigger {
-  border-color: var(--admin-primary);
+  border-color: rgba(255, 255, 255, 0.65);
   background: rgba(20, 22, 28, 1);
-  box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.2);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
 }
 
 .custom-select-label {
@@ -409,7 +453,7 @@ body.admin-body {
 
 .custom-select-box.open .custom-select-arrow {
   transform: rotate(180deg);
-  color: var(--admin-primary);
+  color: #ffffff;
 }
 
 /* Dropdown Menu - Smooth Opening & Closing Animation */
@@ -421,10 +465,10 @@ body.admin-body {
   background: rgba(18, 20, 28, 0.97);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 10px;
   padding: 6px;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(229, 9, 20, 0.15);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
   z-index: 120;
   
   /* Initial Closed State */
@@ -463,14 +507,14 @@ body.admin-body {
 }
 
 .custom-select-option:hover {
-  background: rgba(229, 9, 20, 0.18);
+  background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
   transform: translateX(2px);
 }
 
 .custom-select-option.active {
-  background: rgba(229, 9, 20, 0.25);
-  color: #ff3b47;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
   font-weight: 600;
 }
 
@@ -478,7 +522,7 @@ body.admin-body {
   font-size: 1rem;
   opacity: 0;
   transition: opacity 0.15s ease;
-  color: #ff3b47;
+  color: #ffffff;
 }
 
 .custom-select-option.active .option-check {
@@ -502,15 +546,36 @@ body.admin-body {
   text-decoration: none;
 }
 
-.btn-primary {
-  background: var(--admin-primary);
+.btn-primary,
+.btn-success {
+  background: linear-gradient(135deg, #10b981, #059669);
   color: #ffffff;
+  border: 1px solid #10b981;
 }
 
-.btn-primary:hover {
-  background: var(--admin-primary-hover);
+.btn-primary:hover,
+.btn-success:hover {
+  background: linear-gradient(135deg, #34d399, #059669);
+  border-color: #34d399;
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(229, 9, 20, 0.4);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45);
+}
+
+.btn-blue,
+#btnSaveNewFolderDirect {
+  background: rgba(59, 130, 246, 0.12) !important;
+  color: #60a5fa !important;
+  border: 1px solid rgba(59, 130, 246, 0.35) !important;
+  box-shadow: none !important;
+}
+
+.btn-blue:hover,
+#btnSaveNewFolderDirect:hover {
+  background: rgba(59, 130, 246, 0.25) !important;
+  color: #93c5fd !important;
+  border-color: rgba(59, 130, 246, 0.6) !important;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.25) !important;
+  transform: translateY(-1px);
 }
 
 .btn-secondary {
@@ -849,15 +914,15 @@ body.admin-body {
 }
 
 .badge-admin {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.35);
+  background: rgba(168, 85, 247, 0.18);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.4);
 }
 
 .badge-member {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.35);
+  background: rgba(59, 130, 246, 0.18);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.4);
 }
 
 /* Actions Cell */
@@ -914,25 +979,34 @@ body.admin-body {
 
 /* Drag & Drop Upload Zone */
 .dropzone-container {
-  border: 2px dashed rgba(229, 9, 20, 0.4);
+  border: 2px dashed rgba(255, 255, 255, 0.18);
   background: rgba(15, 18, 26, 0.6);
   border-radius: var(--admin-radius);
   padding: 36px 20px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   position: relative;
 }
 
-.dropzone-container:hover, .dropzone-container.dragover {
-  border-color: var(--admin-primary);
-  background: rgba(229, 9, 20, 0.06);
+.dropzone-container:hover, 
+.dropzone-container.dragover,
+.dropzone-container:focus-within {
+  border-color: #3b82f6;
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.2);
 }
 
 .dropzone-icon {
   font-size: 3.2rem;
-  color: #ff3b47;
+  color: #60a5fa;
   margin-bottom: 12px;
+  transition: transform 0.25s ease, color 0.2s ease;
+}
+
+.dropzone-container:hover .dropzone-icon {
+  transform: translateY(-3px) scale(1.05);
+  color: #93c5fd;
 }
 
 .dropzone-title {
@@ -1027,18 +1101,85 @@ body.admin-body {
   font-family: inherit;
   font-size: 0.9rem;
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
   box-sizing: border-box;
   width: 100%;
 }
 
 .form-control:focus {
-  border-color: var(--admin-primary);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
 }
 
 textarea.form-control {
   min-height: 80px;
   resize: vertical;
+}
+
+/* ==========================================================================
+   Tab Upload Media: Border Biru Saat Fokus/Ditekan & Warna Asli Netral
+   ========================================================================== */
+#tab-upload .box-header h2 ion-icon {
+  color: #60a5fa;
+}
+
+#tab-upload .form-group label {
+  color: var(--admin-text-muted);
+  font-weight: 600;
+}
+
+#tab-upload .form-control {
+  background: rgba(10, 12, 18, 0.85);
+  border: 1px solid var(--admin-card-border);
+  border-radius: 8px;
+  color: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Border biru HANYA muncul saat ditekan / difokuskan */
+#tab-upload .form-control:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+  background: rgba(10, 12, 18, 0.85) !important;
+}
+
+#tab-upload select.form-control {
+  color: #ffffff;
+  background: rgba(10, 12, 18, 0.85);
+  border: 1px solid var(--admin-card-border);
+}
+
+#tab-upload select.form-control:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+}
+
+#tab-upload input[type="date"],
+#tab-upload input[type="time"] {
+  color: #ffffff;
+  color-scheme: dark;
+  background: rgba(10, 12, 18, 0.85);
+  border: 1px solid var(--admin-card-border);
+}
+
+#tab-upload input[type="date"]:focus,
+#tab-upload input[type="time"]:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+}
+
+#tab-upload input[type="date"]::-webkit-calendar-picker-indicator,
+#tab-upload input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.6) sepia(100%) saturate(300%) hue-rotate(185deg);
+  opacity: 0.85;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+#tab-upload input[type="date"]::-webkit-calendar-picker-indicator:hover,
+#tab-upload input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  transform: scale(1.15);
 }
 
 /* Media Table Footer: Centered Pagination & Right Action Buttons */
