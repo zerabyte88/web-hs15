@@ -300,16 +300,23 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { passive: false });
 
   // Close & Cancel buttons
-  cropModalCloseBtn.addEventListener('click', closeCropModal);
-  cropModalCancelBtn.addEventListener('click', closeCropModal);
+  function cancelCropModal() {
+    if (!croppedImageData.value) {
+      profilePhotoInput.value = '';
+    }
+    closeCropModal();
+  }
+
+  cropModalCloseBtn.addEventListener('click', cancelCropModal);
+  cropModalCancelBtn.addEventListener('click', cancelCropModal);
 
   cropModalOverlay.addEventListener('click', (e) => {
     if (e.target === cropModalOverlay) {
-      closeCropModal();
+      cancelCropModal();
     }
   });
 
-  // Apply & Save
+  // Apply crop in modal (preview only, do NOT submit yet)
   cropModalApplyBtn.addEventListener('click', () => {
     if (!currentImg) return;
 
@@ -348,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dataUrl = exportCanvas.toDataURL('image/jpeg', 0.92);
     croppedImageData.value = dataUrl;
 
-    // Update avatar preview on page
+    // Update avatar preview on page immediately so user sees the result
     if (profilePreviewImg) {
       profilePreviewImg.src = dataUrl;
     }
@@ -357,11 +364,31 @@ document.addEventListener('DOMContentLoaded', () => {
       cropPreviewControls.style.display = 'flex';
     }
 
-    // Indicate loading state & submit form
-    cropModalApplyBtn.disabled = true;
-    cropModalApplyBtn.innerHTML = '<ion-icon name="sync-outline" class="spinning-icon"></ion-icon> Menyimpan Foto...';
-
+    // Close the crop modal
     closeCropModal();
-    profileUploadForm.submit();
+
+    // Focus or highlight the "Simpan Foto" submit button below
+    const btnSubmit = document.getElementById('btnSubmitProfile');
+    if (btnSubmit) {
+      btnSubmit.focus();
+    }
+  });
+
+  // Form submit handler: only upload to server when user clicks "Simpan Foto"
+  profileUploadForm.addEventListener('submit', (e) => {
+    const hasCropped = croppedImageData.value && croppedImageData.value.trim() !== '';
+    const hasFile = profilePhotoInput.files && profilePhotoInput.files.length > 0;
+
+    if (!hasCropped && !hasFile) {
+      e.preventDefault();
+      alert('Pilih dan sesuaikan foto profil terlebih dahulu.');
+      return;
+    }
+
+    const btnSubmit = document.getElementById('btnSubmitProfile');
+    if (btnSubmit) {
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = '<ion-icon name="sync-outline" class="spinning-icon"></ion-icon> Menyimpan Foto...';
+    }
   });
 });

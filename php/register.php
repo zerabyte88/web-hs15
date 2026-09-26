@@ -66,7 +66,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../css/background.css">
   <link rel="stylesheet" href="../css/auth.css">
-  <link rel="icon" href="../img/logo.jpg" type="image/jpeg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../img/favicon-32x32.png?v=2">
+  <link rel="icon" type="image/png" sizes="16x16" href="../img/favicon-16x16.png?v=2">
+  <link rel="icon" type="image/png" href="../img/logo.png?v=2">
+  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=2">
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </head>
@@ -79,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <section class="auth-container">
     <div class="auth-card">
       <div class="auth-header">
-        <img src="../img/logo.jpg" alt="HS15 Logo" class="auth-logo">
+        <img src="../img/logo.png" alt="HS15 Logo" class="auth-logo">
         <h2>Buat Akun Baru</h2>
         <p class="auth-subtitle">Bergabung bersama komunitas dokumentasi HS15</p>
       </div>

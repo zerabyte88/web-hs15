@@ -615,7 +615,10 @@ $jsBkgdVer = file_exists(__DIR__ . '/../js/choose.js') ? filemtime(__DIR__ . '/.
   <link rel="stylesheet" href="../css/background.css?v=<?= $bkgdVer ?>">
   <link rel="stylesheet" href="../css/global.css?v=<?= $globalVer ?>">
   <link rel="stylesheet" href="../css/admin.css?v=<?= $cssVer ?>">
-  <link rel="icon" href="../img/logo.jpg" type="image/jpeg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../img/favicon-32x32.png?v=2">
+  <link rel="icon" type="image/png" sizes="16x16" href="../img/favicon-16x16.png?v=2">
+  <link rel="icon" type="image/png" href="../img/logo.png?v=2">
+  <link rel="apple-touch-icon" href="../img/apple-touch-icon.png?v=2">
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </head>
@@ -630,7 +633,7 @@ $jsBkgdVer = file_exists(__DIR__ . '/../js/choose.js') ? filemtime(__DIR__ . '/.
   <header class="admin-header">
     <div class="admin-nav">
       <a href="choose.php" class="admin-logo" id="logo-link">
-        <img src="../img/logo.jpg" alt="HS15 Logo" class="admin-logo-img">
+        <img src="../img/logo.png" alt="HS15 Logo" class="admin-logo-img">
         <span class="logo-title">HS15<span class="logo-sub"> - Komunitas Keliling Banjar</span></span>
       </a>
 
@@ -654,7 +657,7 @@ $jsBkgdVer = file_exists(__DIR__ . '/../js/choose.js') ? filemtime(__DIR__ . '/.
 
       <!-- Desktop User Profile -->
       <div class="admin-nav-user nav-desktop-only">
-        <img src="<?= htmlspecialchars(get_current_user_avatar($conn)) ?>" alt="Foto profil" class="admin-header-avatar avatar-role-admin" onerror="this.onerror=null; this.src='../img/logo.jpg';">
+        <img src="<?= htmlspecialchars(get_current_user_avatar($conn)) ?>" alt="Foto profil" class="admin-header-avatar avatar-role-admin" onerror="this.onerror=null; this.src='../img/logo.png';">
         <div class="user-pill">
           <span class="user-email"><?= htmlspecialchars($currentUserEmail) ?></span>
           <span class="user-role-badge badge-role-admin">
@@ -674,7 +677,7 @@ $jsBkgdVer = file_exists(__DIR__ . '/../js/choose.js') ? filemtime(__DIR__ . '/.
         </button>
         <div class="mobile-dropdown">
           <div class="mobile-dropdown-user">
-            <img src="<?= htmlspecialchars(get_current_user_avatar($conn)) ?>" alt="Foto profil" class="mobile-dropdown-avatar avatar-role-admin" onerror="this.onerror=null; this.src='../img/logo.jpg';">
+            <img src="<?= htmlspecialchars(get_current_user_avatar($conn)) ?>" alt="Foto profil" class="mobile-dropdown-avatar avatar-role-admin" onerror="this.onerror=null; this.src='../img/logo.png';">
             <div class="mobile-dropdown-info">
               <span class="mobile-dropdown-email"><?= htmlspecialchars($currentUserEmail) ?></span>
               <span class="mobile-dropdown-role badge-role-admin">
@@ -1169,7 +1172,7 @@ $jsBkgdVer = file_exists(__DIR__ . '/../js/choose.js') ? filemtime(__DIR__ . '/.
                   <td><?= $u['id'] ?></td>
                   <td class="text-left" style="padding-left: 20px;">
                     <div class="user-cell">
-                      <img src="<?= htmlspecialchars($avatar) ?>" alt="Avatar" onerror="this.onerror=null; this.src='../img/logo.jpg';" class="user-cell-avatar">
+                      <img src="<?= htmlspecialchars($avatar) ?>" alt="Avatar" onerror="this.onerror=null; this.src='../img/logo.png';" class="user-cell-avatar">
                       <div class="user-cell-info">
                         <span class="user-cell-email"><?= htmlspecialchars($u['email']) ?></span>
                         <?php if ($isSelf): ?>

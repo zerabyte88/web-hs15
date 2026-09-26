@@ -584,7 +584,7 @@ function get_media_thumb_url(string $filename, string $mediaType = 'photo', bool
             }
         }
 
-        return '../img/logo.jpg';
+        return '../img/logo.png';
     }
 }
 
@@ -778,7 +778,7 @@ function get_user_avatar(?string $photoPath, int $userId = 0): string {
         }
     }
 
-    return '../img/logo.jpg';
+    return '../img/logo.png';
 }
 
 /**
@@ -786,7 +786,7 @@ function get_user_avatar(?string $photoPath, int $userId = 0): string {
  */
 function get_current_user_avatar(mysqli $conn): string {
     if (empty($_SESSION['user_id'])) {
-        return '../img/logo.jpg';
+        return '../img/logo.png';
     }
     $uid = (int) $_SESSION['user_id'];
     $stmt = $conn->prepare("SELECT profile_photo FROM users WHERE id = ? LIMIT 1");
@@ -798,5 +798,5 @@ function get_current_user_avatar(mysqli $conn): string {
             return get_user_avatar($row['profile_photo'] ?? null, $uid);
         }
     }
-    return '../img/logo.jpg';
+    return '../img/logo.png';
 }

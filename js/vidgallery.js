@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
           var posterUrl = vid.dataset.poster;
 
           // Cek apakah poster URL adalah fallback logo (berarti belum ada thumbnail)
-          if (posterUrl && !posterUrl.includes("logo.jpg")) {
+          if (posterUrl && !posterUrl.includes("logo.")) {
             // Thumbnail sudah ada di server, langsung pakai
             vid.poster = posterUrl;
           } else if (vid.dataset.filename) {
@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Fallback tanpa IntersectionObserver
     videoItems.forEach(function (vid) {
       var posterUrl = vid.dataset.poster;
-      if (posterUrl && !posterUrl.includes("logo.jpg")) {
+      if (posterUrl && !posterUrl.includes("logo.")) {
         vid.poster = posterUrl;
       } else if (vid.dataset.filename) {
         captureVideoFrame(vid, vid.dataset.filename)
