@@ -1,9 +1,11 @@
-# 🖼️ HS15 Web Gallery & Archive
+<div align="center">
 
-> **A high-performance, private digital media archive and gallery system engineered for HS15 - Komunitas Keliling Banjar.**  
-> Crafted with **Native PHP** and **MySQL** with zero third-party framework overhead, delivering lightweight performance, rapid load times, and frictionless deployment.
+<img src="img/logo.png" alt="HS15 Community Logo" width="130" height="130" />
 
----
+# HS15 Web Gallery & Archive
+
+**A high-performance, private digital media archive and gallery system engineered for HS15 - Komunitas Keliling Banjar.**  
+Crafted with **Native PHP** and **MySQL** with zero third-party framework overhead, delivering lightweight performance, rapid load times, and frictionless deployment.
 
 <p align="center">
   <img src="https://img.shields.io/badge/PHP-8.0%20--%208.5%2B-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP Version" />
@@ -13,30 +15,32 @@
   <img src="https://img.shields.io/badge/UI%20Design-Dark%20Mode-1e293b?style=for-the-badge" alt="Dark Mode UI" />
 </p>
 
+</div>
+
 ---
 
-## 📑 Table of Contents
+## Table of Contents
 
-- [Overview](#-overview)
-- [Key Features](#-key-features)
+- [Overview](#overview)
+- [Key Features](#key-features)
   - [1. Photo Gallery Engine](#1-photo-gallery-engine)
   - [2. Video Gallery & Streaming Engine](#2-video-gallery--streaming-engine)
   - [3. Profile & Account Management](#3-profile--account-management)
   - [4. Unified Administration Suite](#4-unified-administration-suite)
   - [5. Security & System Architecture](#5-security--system-architecture)
-- [System Requirements](#-system-requirements)
-- [Directory Structure](#-directory-structure)
-- [Installation & Deployment Guide](#-installation--deployment-guide)
+- [System Requirements](#system-requirements)
+- [Directory Structure](#directory-structure)
+- [Installation & Deployment Guide](#installation--deployment-guide)
   - [A. Local Environment Setup (Laragon / XAMPP)](#a-local-environment-setup-laragon--xampp)
   - [B. Production Deployment (cPanel / Shared Hosting / VPS)](#b-production-deployment-cpanel--shared-hosting--vps)
-- [Role-Based Access Control (RBAC)](#-role-based-access-control-rbac)
-- [License & Usage Policy](#-license--usage-policy)
+- [Role-Based Access Control (RBAC)](#role-based-access-control-rbac)
+- [License & Usage Policy](#license--usage-policy)
 
 ---
 
-## 📌 Overview
+## Overview
 
-**HS15 Web Gallery & Archive** serves as the private, centralized media documentation repository for members of the **HS15 - Komunitas Keliling Banjar** community. 
+**HS15 Web Gallery & Archive** serves as the private, centralized media documentation repository for members of the **HS15 - Komunitas Keliling Banjar** community.
 
 Unlike heavy CMS or modern bloated frameworks, this application is deliberately crafted with **clean, modern Native PHP (8.0 through 8.5+)** paired with **Vanilla CSS3** and **Vanilla ES6+ JavaScript**. It delivers instant page response times, minimal server resource utilization, and hassle-free deployment across standard shared hosting (cPanel), VPS environments, or local development stacks.
 
@@ -48,13 +52,13 @@ Unlike heavy CMS or modern bloated frameworks, this application is deliberately 
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 ### 1. Photo Gallery Engine
 - **Automated WebP Thumbnail Pipeline**: High-resolution photos are dynamically converted into lightweight WebP thumbnails (480px width) on-demand using the PHP GD library upon first access. Thumbnails are permanently cached in `media/thumbs/`, guaranteeing near-instant subsequent page renders.
 - **Progressive Lazy Loading & Shimmer**: Integrated native progressive loading (`loading="lazy"` and `decoding="async"`) paired with smooth CSS shimmer placeholders to prevent cumulative layout shifts (CLS).
-- **Interactive Fullscreen Lightbox**: Click any photo to launch an immersive modal viewer displaying full resolution imagery, title, capture date/time, and activity notes. Features complete keyboard accessibility (`←` / `→` arrow navigation and `ESC` to close) alongside a lossless 1-click download button.
-- **Folder Filtering & Adaptive Pagination**: Clean organization by activity albums/folders with a 18-photo-per-page responsive layout and smart pagination controls.
+- **Interactive Fullscreen Lightbox**: Click any photo to launch an immersive modal viewer displaying full resolution imagery, title, capture date/time, and activity notes. Features complete keyboard accessibility (`Left` / `Right` arrow navigation and `ESC` to close) alongside a lossless 1-click download button.
+- **Folder Filtering & Adaptive Pagination**: Clean organization by activity albums/folders with an 18-photo-per-page responsive layout and smart pagination controls.
 
 ### 2. Video Gallery & Streaming Engine
 - **Client-Side Poster Generation (Zero FFmpeg)**: Video cover posters are captured directly from the first frame in the client's browser via HTML5 Canvas, then uploaded and cached as server-side `.jpg` files. This eliminates the need for resource-intensive server-side FFmpeg installations.
@@ -95,7 +99,7 @@ Unlike heavy CMS or modern bloated frameworks, this application is deliberately 
 
 ---
 
-## 🧰 System Requirements
+## System Requirements
 
 | Component | Minimum Version | Recommended / Tested Version |
 | :--- | :--- | :--- |
@@ -113,7 +117,7 @@ Unlike heavy CMS or modern bloated frameworks, this application is deliberately 
 
 ---
 
-## 📁 Directory Structure
+## Directory Structure
 
 ```text
 project_hs15/
@@ -158,13 +162,14 @@ project_hs15/
 │   ├── .htaccess             # Hardened security directive blocking direct HTTP access
 │   └── thumbs/               # Cached WebP photo thumbnails and video posters
 └── img/                      # Public static graphic assets
-    ├── logo.jpg              # Official HS15 community emblem
+    ├── logo.png              # Official HS15 community emblem
+    ├── logo.jpg              # Legacy HS15 community emblem
     └── profiles/             # User avatar uploads (managed automatically)
 ```
 
 ---
 
-## 🚀 Installation & Deployment Guide
+## Installation & Deployment Guide
 
 ### A. Local Environment Setup (Laragon / XAMPP)
 
@@ -252,23 +257,23 @@ project_hs15/
 
 ---
 
-## 🔑 Role-Based Access Control (RBAC)
+## Role-Based Access Control (RBAC)
 
 The application implements a strict two-tiered permission hierarchy:
 
 | Feature / Capability | Member | Administrator |
 | :--- | :---: | :---: |
-| Browse Photo Gallery & Lightbox | ✅ | ✅ |
-| Stream & Scrub Videos (HTTP 206) | ✅ | ✅ |
-| Download Lossless Original Media | ✅ | ✅ |
-| Personal Profile & 1:1 Avatar Cropper | ✅ | ✅ |
-| Self-Service Password Management | ✅ | ✅ |
-| Access Unified Admin Dashboard | ❌ | ✅ |
-| Batch Upload Photos & Videos | ❌ | ✅ |
-| Create & Manage Albums / Folders | ❌ | ✅ |
-| Edit Media Metadata (Titles, Notes) | ❌ | ✅ |
-| Single & Batch Delete Media Files | ❌ | ✅ |
-| Register New Members & Manage Roles | ❌ | ✅ |
+| Browse Photo Gallery & Lightbox | Yes | Yes |
+| Stream & Scrub Videos (HTTP 206) | Yes | Yes |
+| Download Lossless Original Media | Yes | Yes |
+| Personal Profile & 1:1 Avatar Cropper | Yes | Yes |
+| Self-Service Password Management | Yes | Yes |
+| Access Unified Admin Dashboard | No | Yes |
+| Batch Upload Photos & Videos | No | Yes |
+| Create & Manage Albums / Folders | No | Yes |
+| Edit Media Metadata (Titles, Notes) | No | Yes |
+| Single & Batch Delete Media Files | No | Yes |
+| Register New Members & Manage Roles | No | Yes |
 | **Visual Indicator** | **Electric Cyan Border & Badge** | **Amethyst Purple Border & Badge** |
 
 > [!TIP]
@@ -276,13 +281,13 @@ The application implements a strict two-tiered permission hierarchy:
 
 ---
 
-## 💬 License & Usage Policy
+## License & Usage Policy
 
 - **Community Archive**: This software was designed and developed specifically for internal documentation and archival use by **HS15 - Komunitas Keliling Banjar**.
 - **Privacy & Protection**: All captured media assets, personal avatars, and community records are protected behind authenticated session barriers to safeguard member privacy.
 
 ---
 
-<p align="center">
+<div align="center">
   <sub>Developed with pride for <b>HS15 - Komunitas Keliling Banjar</b>. Built for speed, security, and simplicity.</sub>
-</p>
+</div>
