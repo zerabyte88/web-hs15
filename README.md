@@ -19,25 +19,6 @@ Crafted with **Native PHP** and **MySQL** with zero third-party framework overhe
 
 ---
 
-## Table of Contents
-
-- [Overview](#overview)
-- [Key Features](#key-features)
-  - [1. Photo Gallery Engine](#1-photo-gallery-engine)
-  - [2. Video Gallery & Streaming Engine](#2-video-gallery--streaming-engine)
-  - [3. Profile & Account Management](#3-profile--account-management)
-  - [4. Unified Administration Suite](#4-unified-administration-suite)
-  - [5. Security & System Architecture](#5-security--system-architecture)
-- [System Requirements](#system-requirements)
-- [Directory Structure](#directory-structure)
-- [Installation & Deployment Guide](#installation--deployment-guide)
-  - [A. Local Environment Setup (Laragon / XAMPP)](#a-local-environment-setup-laragon--xampp)
-  - [B. Production Deployment (cPanel / Shared Hosting / VPS)](#b-production-deployment-cpanel--shared-hosting--vps)
-- [Role-Based Access Control (RBAC)](#role-based-access-control-rbac)
-- [License & Usage Policy](#license--usage-policy)
-
----
-
 ## Overview
 
 **HS15 Web Gallery & Archive** serves as the private, centralized media documentation repository for members of the **HS15 - Komunitas Keliling Banjar** community.
